@@ -31,8 +31,8 @@ const getAllTasks = async (req, res) => {
 
     const decodedToken = checkToken(req.cookies.jwt)
 
-    const tasks = await Task.find({ author: decodedToken.id })
-      .populate("author", "firstName lastName email")
+    const tasks = await Task.find({ author: decodedToken.id }).populate("author", "firstName lastName email") 
+      // ("field", "keys to return")
       // {path: "author", model: "Users" }
 
     res.status(200).json({ 
@@ -46,7 +46,7 @@ const getSingleTask = async (req, res) => {
 
     const taskID = { _id: req.params.id }
 
-    const task = await Task.findOne(taskID)
+    const task = await Task.findOne(taskID).populate("author", "firstName lastName email")
 
     res.status(200).json({ task })
   }
@@ -88,6 +88,7 @@ const sendListToemail = async (req, res) => {
       return `TaskName: ${obj.taskName}, Completed: ${obj.completed}\n`
     }).join("")
   
+    // send email containing list of task
     const mailgun = new Mailgun(formData);
 
 		const client = mailgun.client({
@@ -98,24 +99,22 @@ const sendListToemail = async (req, res) => {
 		const messageData = {
 			from: 'joshua Onwuemene <josh@mailgun.org>',
 			to: email,
-			subject: 'TASKS LIST',
-			text: text
-		};
+			subject: 'REQUEST FOR LIST OF TASKS',
+			text: `Here is a list of your tasks\n 
+        ${text}`
+    }
 
 		client.messages.create(DOMAIN, messageData)
-		.then((res) => {
-			console.log(res);
-		})
-		.catch((err) => {
-			console.error(err);
-		});
+      .then( res => console.log(res) )
+      .catch( err => console.error(err) )
 
-    res.status(200).json(res)
+    res.status(200).json(messageData)
 
-    } catch (err) {
+    } 
+    catch (err) {
         console.log(err);
+      }
     }
-  }
 
 
 module.exports = { 

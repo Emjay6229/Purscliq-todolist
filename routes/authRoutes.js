@@ -6,18 +6,16 @@ const {
     getNewPasswordForm
   } = require("../controllers/page_controller")
 
-const { verifyResetEmailAndSendLink } = require("../controllers/verifyResetEmail")
-const { updatePassword } = require("../controllers/resetPassword")
-
+const { verifyResetEmailAndSendLink, updatePassword } = require("../controllers/resetUserPassword")
 const { 
-  userSignup, 
-  userSignin, 
-  userSignout,
-  updateUser,
-  deleteUser
-} = require("../controllers/auth_controller")
+        userSignup, 
+        userSignin, 
+        userSignout,
+        updateUser,
+        deleteUser
+    } = require("../controllers/auth_controller")
 
-const {verifyToken} = require("../middlewares/auth")
+const { verifyToken } = require("../middlewares/auth")
 
 router.route("/signup")
   .get( getSignUpForm )
@@ -41,6 +39,5 @@ router.route("/resetPassword/:token")
 
 router.route("/signout")
   .post( verifyToken, userSignout )
-
 
 module.exports = router;
