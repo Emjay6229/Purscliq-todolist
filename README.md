@@ -30,23 +30,23 @@ Send a POST request to <a href="http://localhost:5000/user/signout/">http://loca
 2. Copy link to Postman and send a PATCH request with new password as body.
 
 ### Create, retreive, Modify and Delete tasks
-POST <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Create task
+- POST <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Create task
 
-GET <a href="http://localhost:5000/user/signin/tasks/allTask/">http://localhost:5000/user/signin/tasks/allTask</a> : Retrieve all tasks created, sent and received
-GET <a href="http://localhost:5000/user/signin/tasks/received/">http://localhost:5000/user/signin/tasks/received/</a> : Retrieve tasks created and received
-GET <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Retrieve your tasks
-GET <a href="http://localhost:5000/user/signin/tasks/:id">http://localhost:5000/user/signin/tasks/:id/</a> : Retrieve a specific task by id
+- GET <a href="http://localhost:5000/user/signin/tasks/allTask/">http://localhost:5000/user/signin/tasks/allTask</a> : Retrieve all tasks created, sent and received
+- GET <a href="http://localhost:5000/user/signin/tasks/received/">http://localhost:5000/user/signin/tasks/received/</a> : Retrieve tasks created and received
+- GET <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Retrieve your tasks
+- GET <a href="http://localhost:5000/user/signin/tasks/:id">http://localhost:5000/user/signin/tasks/:id/</a> : Retrieve a specific task by id
 
-PATCH <a href="http://localhost:5000/user/signin/tasks/:id/">http://localhost:5000/user/signin/tasks/:id</a> : Modify a task
+- PATCH <a href="http://localhost:5000/user/signin/tasks/:id/">http://localhost:5000/user/signin/tasks/:id</a> : Modify a task
 
-DELETE <a href="http://localhost:5000/user/signin/tasks/:id/">http://localhost:5000/user/signin/tasks/:id</a> : Delete a task
-DELETE <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Delete all tasks
+- DELETE <a href="http://localhost:5000/user/signin/tasks/:id/">http://localhost:5000/user/signin/tasks/:id</a> : Delete a task
+- DELETE <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Delete all tasks
 
 ### Send task to mail
-POST <a href="http://localhost:5000/user/signin/tasks/mail">http://localhost:5000/user/signin/tasks/mail</a>
+- POST <a href="http://localhost:5000/user/signin/tasks/mail">http://localhost:5000/user/signin/tasks/mail</a>
 
 ### Export as PDF
-1. Enter "taskName"
+1. Enter "taskName" at URL below
 2. POST <a href="http://localhost:5000/user/signin/tasks/createFile">http://localhost:5000/user/signin/tasks/createFile</a>
 
 
