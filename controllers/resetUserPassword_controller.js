@@ -1,11 +1,10 @@
 require("dotenv").config();
 const User = require("../models/Users")
 const crypto = require("crypto")
-const formData = require('form-data');
-const Mailgun = require('mailgun.js');
 const bcrypt = require("bcrypt");
-const { DOMAIN } = process.env
-const { api_key } = process.env
+const sendToMail = require("../middlewares/sendToMail")
+const domain = process.env.DOMAIN
+const key = process.env.api_key
 
 // verify user email and send reset link
 exports.verifyResetEmailAndSendLink = async (req, res) => {
@@ -28,28 +27,18 @@ exports.verifyResetEmailAndSendLink = async (req, res) => {
 
             // send reset link via mail
             const token = verifiedUser.resetToken;
-            const mailgun = new Mailgun(formData);
-
-            const client = mailgun.client({
-                username: 'api', 
-                key: api_key
-            });
-
+           
             const text = `<h3> Here is the link to reset your password <h3> <br>
             <a href=http://localhost:5000/user/resetPassword/${token}>Reset Password</a>`
 
             const messageData = {
-                from: 'joshua Onwuemene <josh@mailgun.org>',
+                from: 'Johnny Storm <jon@gmail.com>',
                 to: email,
                 subject: 'PASSWORD RESET LINK',
                 html: text
             };
-
-            client.messages.create(DOMAIN, messageData)
-                .then( res => console.log(res) )
-                .catch( err => console.error(err) );
-
-            res.status(200).json(messageData)
+            
+            sendToMail(res, domain, key, messageData)
         } 
         catch (err) {
             console.log(err)

@@ -1,25 +1,35 @@
 const router = require("express").Router()
 
-// where "/" === "/user/signin/tasks"
+// where "/" === "/user/tasks"
 
 const { 
         createTask,
-        getAllTasks, 
+        getMyTasks, 
+        getTotalTasksSentAndReceived,
+        getTotalTasksReceived,
         getSingleTask, 
-        updateTask,  
-        deleteTask,
-        sendListToemail
+        updateTask,
+        deleteAllTask,  
+        deleteOneTask,
+        sendListToEmail,
+        convertToPDF
     } = require("../controllers/task_controller")
 
 router.route("/")
     .post( createTask )
-    .get( getAllTasks )
-   
+    .get( getMyTasks )
+    .delete( deleteAllTask )
+router.route("/allTask")
+    .get( getTotalTasksSentAndReceived )
+router.route("/received")
+    .get( getTotalTasksReceived )
 router.route("/:id")
     .get( getSingleTask )
     .patch( updateTask )
-    .delete( deleteTask )
-router.route("/mailList")
-    .post( sendListToemail )
+    .delete( deleteOneTask )
+router.route("/mail")
+    .post( sendListToEmail )
+router.route("/createFile")
+    .post( convertToPDF )
 
 module.exports = router;

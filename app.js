@@ -1,14 +1,13 @@
 require("dotenv").config();
-require("express-async-errors")
 const express = require("express")
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
-const { verifyToken } = require("./middlewares/auth")
-
+const session = require("express-session");
 const app = express()
-
+const cookieParser = require("cookie-parser");
+require("express-async-errors");
+const cors = require("cors");
 const connect = require("./config/db")
 const errorsMiddleware = require("./middlewares/error")
+const { verifyToken } = require("./middlewares/auth")
 
 // Mount Middleware
 app.use(express.static("./public"))
@@ -18,10 +17,24 @@ app.use(cookieParser());
 app.use(errorsMiddleware)
 app.use(cors());
 
+// Start Session
+app.use( session( {
+    secret: process.env.secret_key,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 120 * 1000,
+        httpOnly: true
+      }
+    }
+  )
+)
+
+// ROUTES
 const authRoutes = require("./routes/authRoutes")
 const taskRoutes = require("./routes/taskRoutes")
 
-// ROUTES
+// SET ROUTES
 app.use("/user", authRoutes)
 app.use("/user/signin/tasks", verifyToken, taskRoutes)
 

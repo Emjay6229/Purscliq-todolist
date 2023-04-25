@@ -6,13 +6,14 @@ const {
     getNewPasswordForm
   } = require("../controllers/page_controller")
 
-const { verifyResetEmailAndSendLink, updatePassword } = require("../controllers/resetUserPassword")
+const { verifyResetEmailAndSendLink, updatePassword } = require("../controllers/resetUserPassword_controller")
 const { 
         userSignup, 
         userSignin, 
         userSignout,
-        updateUser,
-        deleteUser
+        updateMyProfile,
+        getMyProfile,
+        deleteMyProfile
     } = require("../controllers/auth_controller")
 
 const { verifyToken } = require("../middlewares/auth")
@@ -25,9 +26,10 @@ router.route("/signin")
   .get( getSignInForm )
   .post( userSignin )
 
-router.route("/:id")
-  .patch( updateUser )
-  .delete( deleteUser )
+router.route("/:userId")
+  .get( verifyToken, getMyProfile )
+  .patch( verifyToken, updateMyProfile )
+  .delete( verifyToken, deleteMyProfile )
   
 router.route("/resetPassword")
   .get( getResetPasswordForm )

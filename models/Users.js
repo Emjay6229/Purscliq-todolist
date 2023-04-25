@@ -14,6 +14,12 @@ const userSchema = Schema( {
         trim: true,
         required: [ true, "This field is required"]
     },
+    userId: {
+      type: String,
+      required:  [true, "This field is required"],
+      unique: true,
+      trim: true
+    },
     email: {
         type: String,
         required:  [true, "This field is required"],
@@ -35,10 +41,10 @@ const userSchema = Schema( {
 )
 
 // create login method
-  userSchema.statics.login = async function( email, password ) {
-    const user = await this.findOne({ email })
+  userSchema.statics.login = async function( email, password, userId ) {
+    const user = await this.findOne({ email } ) || await this.findOne({ userId} )
 
-      if (!user) {
+      if (!user ) {
         throw new Error("User does not exist.");
       } 
 
