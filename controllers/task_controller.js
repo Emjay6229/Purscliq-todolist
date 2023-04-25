@@ -1,3 +1,4 @@
+// import dependencies/modules
 const { checkToken } = require("../middlewares/checkDecodedToken")
 const Task = require("../models/Tasks");
 const User = require("../models/Users");
@@ -7,7 +8,7 @@ const fs = require("fs");
 const domain = process.env.DOMAIN
 const key = process.env.api_key
 
-// Create Task
+// Create new Task function
 const createTask = async (req, res) => {
   try {
     const decodedToken = checkToken(req.cookies.jwt);
@@ -55,7 +56,7 @@ const getMyTasks = async (req, res) => {
 }
 
 
-// Get a Single Task
+// Get a single Task function
 const getSingleTask = async (req, res) => {
   try {
     const taskID = { _id: req.params.id }
@@ -114,7 +115,7 @@ const getTotalTasksReceived = async (req, res) => {
 
 
 
-// Update Tasks
+// Update a Task function
 const updateTask =  async (req, res) => {
   try {
     const taskID = { _id: req.params.id };

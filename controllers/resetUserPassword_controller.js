@@ -1,3 +1,4 @@
+// import dependencies
 require("dotenv").config();
 const User = require("../models/Users")
 const crypto = require("crypto")
@@ -9,15 +10,15 @@ const key = process.env.api_key
 // verify user email and send reset link
 exports.verifyResetEmailAndSendLink = async (req, res) => {
     try {
-            // verify user email and create reset token
-            const resetToken = crypto.randomBytes(32).toString("hex");
-            const { email } = req.body;
-            const verifiedUser = await User.findOne( { email } )
-        
-            if( !verifiedUser ) {
-                console.log("User does not exist");
-                res.redirect("../public/views/resetPassword.html")
-            }
+          // verify user email and create reset token
+	    const resetToken = crypto.randomBytes(32).toString("hex");
+	    const { email } = req.body;
+	    const verifiedUser = await User.findOne( { email } )
+	    
+	    if( !verifiedUser ) {
+		console.log("User does not exist");
+		res.redirect("../public/views/resetPassword.html")
+	    }
 
             verifiedUser.resetToken = resetToken;
             verifiedUser.resetTokenExpiration = Date.now() + 3600000; 
@@ -49,9 +50,6 @@ exports.verifyResetEmailAndSendLink = async (req, res) => {
 exports.updatePassword = async (req, res) => {
 	const { token } = req.params;
 	const { newPassword, confirmPassword  } = req.body;
-
-	console.log(newPassword, confirmPassword)
-
 	const user = await User.findOne( { resetToken: token } );
 
 	try {
@@ -66,20 +64,21 @@ exports.updatePassword = async (req, res) => {
 
 		if (verifyPassword) {
 			throw new Error ("You cannot use an old password")
-			}
+		}
 
 		const securePass = await bcrypt.hash(newPassword, bcrypt.genSaltSync(10));
+		
 		const updatedPassword = await User.findOneAndUpdate(
                 { resetToken: token }, 
                 { password: securePass }, 
                 { new: true, runValidators: true }
             ).select("firstName lastName email password")
 
-		res.status(201).json(updatedPassword)
-        res.redirect("../public/views/signin.html")
+		res.status(201).json(updatedPassword);
+		res.redirect("../public/views/signin.html")
 		console.log("Password has been successfully reset")
 	} 
-    catch(err) {
+    	catch(err) {
 		console.log(err)
 		res.status(201).json(err.message)
 	}

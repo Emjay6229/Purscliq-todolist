@@ -1,3 +1,4 @@
+// import modules/ dependencies
 require("dotenv").config()
 const User = require("../models/Users")
 const bcrypt = require("bcrypt")
@@ -16,7 +17,6 @@ const createToken = (firstName, lastName, id, userId, email) => {
     }
     return jwt.sign( payLoad, secret_key, { expiresIn: jwt_life })
 }
-
 
 // REGISTER NEW USER
 const userSignup = async ( req, res ) => {
