@@ -1,6 +1,9 @@
 # PURSCLIQ TO-DO LIST API
 A Task management API that authenticates users and allows them save, schedule and manage tasks.
 
+## AUTHOR
+JOSHUA ONWUEMENE
+
 ## FEATURES
 - Authentication and Authorization
 - Password reset
