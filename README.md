@@ -32,8 +32,7 @@ Send a POST request to <a href="http://localhost:5000/user/signout/">http://loca
 ### Create, retreive, Modify and Delete tasks
 - POST <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Create task
 
-- GET <a href="http://localhost:5000/user/signin/tasks/allTask/">http://localhost:5000/user/signin/tasks/allTask</a> : Retrieve all tasks created, sent and received
-- GET <a href="http://localhost:5000/user/signin/tasks/received/">http://localhost:5000/user/signin/tasks/received/</a> : Retrieve tasks created and received
+- GET <a href="http://localhost:5000/user/signin/tasks/received/">http://localhost:5000/user/signin/tasks/total/</a> : Retrieve tasks created and received
 - GET <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Retrieve your tasks
 - GET <a href="http://localhost:5000/user/signin/tasks/:id">http://localhost:5000/user/signin/tasks/:id/</a> : Retrieve a specific task by id
 
