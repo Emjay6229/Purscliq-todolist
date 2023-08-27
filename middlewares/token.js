@@ -19,7 +19,7 @@ exports.checkToken = token => {
 
         const signedToken = jwt.verify(token, secret_key);
 
-        if (!signedToken) throw new Error;
+        if (!signedToken) throw new Error("Something went wrong with token verification");
 
         return signedToken;
 

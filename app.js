@@ -1,24 +1,21 @@
 require("dotenv").config();
 const express = require("express");
-
-const app = express();
-
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const connect = require("./config/db");
-const errorsMiddleware = require("./middlewares/error");
 const { verifyToken } = require("./middlewares/auth");
+
+const authRoutes = require("./routes/authRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+const profileRoutes = require("./routes/profile_routes");
+
+const app = express();
 
 app.use(express.static("./public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(errorsMiddleware);
 app.use(cors());
-
-const authRoutes = require("./routes/authRoutes");
-const taskRoutes = require("./routes/taskRoutes");
-const profileRoutes = require("./routes/profile_routes");
 
 app.use("/auth", authRoutes);
 app.use("/api", verifyToken);

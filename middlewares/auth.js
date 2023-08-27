@@ -6,16 +6,14 @@ const verifyToken = (req, res, next) => {
     const token = req.cookies.jwt;
 
     if(!token) {
-        res.json("Authentication Failed. Please sign in again");
+        res.status(500).json("Authentication failed. Please sign in again");
     } else {
-        jwt.verify(token, secret_key, (err, decodedToken) => {
-            if (err) {
-                throw err.message;
-            } 
+        jwt.verify(token, secret_key, err => { 
+            if (err) throw err.message; 
         })
 
         next();
-    }
-}
+    };
+};
 
 module.exports = { verifyToken };
