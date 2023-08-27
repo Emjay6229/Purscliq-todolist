@@ -1,40 +1,35 @@
-const mongoose = require("mongoose")
-const { Schema } = mongoose
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const taskSchema = new Schema( {
-    taskName: {
-            type: String,
-            required: [ true, "Enter this field to add a task"]
-        }, 
-    createdBy: {
-            type: Schema.Types.ObjectId,
-            ref: "Users",
-            required: true
-            // parent referencing.
-            // Looks inside the User model and finds the user with this _id
-        },
-    startDate: {
-            type: String, 
-            default: Date
-        },
-    completed: {
-            type: Boolean,
-            default: false
-        },
-    from: {
-            type: String,
-            ref: "Users"
-        }, 
-    to: {
-            type: String,
-            ref: "Users"
-        },
-    endDate: {
-        type: String
-    }
-},
+function formatDateToCustomFormat() {
+    const date = new Date();
+    const year = date.getFullYear().toString();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+    const day = date.getDate().toString().padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  }
 
-{ timestamps: true } 
+const taskSchema = new Schema(
+    {
+        title: { type: String, required: [ true, "Enter this field to add a task"] }, 
+
+        createdBy: { type: Schema.Types.ObjectId, ref: "Users", required: true },
+
+        label: String,
+
+        startDate: { type: String, default: formatDateToCustomFormat() },
+
+        completed: { type: Boolean, default: false },
+
+        from: { type: String, ref: "Users" },
+
+        to: { type: String, ref: "Users" },
+            
+        endDate: String
+    } ,
+
+    { timestamps: true } 
 )
 
 module.exports = mongoose.model("Tasks", taskSchema);

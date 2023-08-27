@@ -1,7 +1,7 @@
-const mongoose = require("mongoose")
-const { Schema } = mongoose
-const bcrypt = require("bcrypt")
-const { isEmail }= require("validator")
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+const bcrypt = require("bcrypt");
+const { isEmail }= require("validator");
 
 const userSchema = Schema( {
     firstName: {
@@ -9,17 +9,13 @@ const userSchema = Schema( {
         trim: true,
         required: [ true, "This field is required"]
     }, 
+
     lastName: {
         type: String,
         trim: true,
         required: [ true, "This field is required"]
     },
-    userId: {
-      type: String,
-      required:  [true, "This field is required"],
-      unique: true,
-      trim: true
-    },
+
     email: {
         type: String,
         required:  [true, "This field is required"],
@@ -28,6 +24,7 @@ const userSchema = Schema( {
         validate: [isEmail, "invalid Email address"],
         lowerCase: true,
     },
+
     password: {
         type: String,
         trim: true,

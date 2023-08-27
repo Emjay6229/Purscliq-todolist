@@ -1,55 +1,38 @@
 require("dotenv").config();
-const express = require("express")
-const session = require("express-session");
-const app = express()
-const cookieParser = require("cookie-parser");
-require("express-async-errors");
-const cors = require("cors");
-const connect = require("./config/db")
-const errorsMiddleware = require("./middlewares/error")
-const { verifyToken } = require("./middlewares/auth")
+const express = require("express");
 
-// Mount Middleware
-app.use(express.static("./public"))
-app.use(express.json())
-app.use(express.urlencoded( { extended: false } ))
+const app = express();
+
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const connect = require("./config/db");
+const errorsMiddleware = require("./middlewares/error");
+const { verifyToken } = require("./middlewares/auth");
+
+app.use(express.static("./public"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(errorsMiddleware)
+app.use(errorsMiddleware);
 app.use(cors());
 
-// Start Session
-app.use( session( {
-    secret: process.env.secret_key,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        maxAge: 120 * 1000,
-        httpOnly: true
-      }
-    }
-  )
-)
+const authRoutes = require("./routes/authRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+const profileRoutes = require("./routes/profile_routes");
 
-// ROUTES
-const authRoutes = require("./routes/authRoutes")
-const taskRoutes = require("./routes/taskRoutes")
+app.use("/auth", authRoutes);
+app.use("/api", verifyToken);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/profile", profileRoutes);
 
-// SET ROUTES
-app.use("/user", authRoutes)
-app.use("/user/signin/tasks", verifyToken, taskRoutes)
+const port = process.env.port || 5000;
 
-const port = process.env.port || 5000
-
-// Start server
 const start = async () => {
     try {
-        connect(process.env.MONGO_URL)
-
-        app.listen(port, () => {
-        console.log(`server is running on port ${port}...`)
-      })
+        await connect(process.env.MONGO_URL);
+        app.listen(port, () => console.log(`server is running on port ${port}...`));
     } catch(err) {
-          console.log(err.message)
+          console.log(err.message);
         }
       }
 
