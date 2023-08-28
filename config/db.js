@@ -5,7 +5,7 @@ const options = {
   useUnifiedTopology: true
 };
 
-const connect = async(url) => {
+const connect = async (url) => {
     try {
         await mongoose.connect(url, options);
         console.log("connected to MongoDB!");
