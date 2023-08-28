@@ -20,7 +20,16 @@ const taskSchema = new Schema(
 
         startDate: { type: String, default: formatDateToCustomFormat() },
 
-        completed: { type: Boolean, default: false },
+        status: {
+            type: String,
+            enum: { 
+                values: ['completed', 'pending', 'in progress'], 
+                message: '{VALUE} is not supported' 
+            },
+            default: 'in progress'
+        },
+
+        // completed: { type: Boolean, default: false },
 
         from: { type: String, ref: "Users" },
 

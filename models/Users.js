@@ -41,18 +41,16 @@ const userSchema = Schema( {
   userSchema.statics.login = async function( email, password, userId ) {
     const user = await this.findOne({ email } ) || await this.findOne({ userId} )
 
-      if (!user ) {
-        throw new Error("User does not exist.");
-      } 
+    if (!user )
+      throw new Error("User does not exist.");
 
-      if(!password) {
-        throw new Error("Password is required.");
-      }
+    if(!password)
+      throw new Error("Password is required.");
     
     const isPasswordMatch = await bcrypt.compare( password, user.password );
-    if ( !isPasswordMatch ) {
-            throw new Error("Incorrect password");
-          }
+
+    if ( !isPasswordMatch ) 
+      throw new Error("Incorrect password");
 
     return user;
   }

@@ -19,23 +19,16 @@ router.route("/")
     .get( getMyTasks )
     .delete( deleteAllTask );
 
-router.route("/all_task")
-    .get( getAllTasksSentAndReceived );
-
-router.route("/total_task")
-    .get( getReceivedTasks );
-
-router.route("/mail_list")
-    .post( sendTaskListToEmail );
-
 router.route("/filter").get(filterData);
-
-router.route("/create_file")
-    .post( convertToPDF );
+router.route("/create_file").post( convertToPDF );
 
 router.route("/:id")
     .get( getSingleTask )
     .patch( editTask )
     .delete( deleteOneTask );
+
+router.route("/all_task").get( getAllTasksSentAndReceived );
+router.route("/total_task").get( getReceivedTasks );
+router.route("/mail_list").post( sendTaskListToEmail );
 
 module.exports = router;

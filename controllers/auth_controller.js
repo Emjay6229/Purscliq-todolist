@@ -32,7 +32,7 @@ const userSignup = async ( req, res ) => {
             user.email
         );
 
-        return res.cookie("jwt", token, { httpOnly: true, maxAge: jwt_life }).status(200).json("Account created successfully!", user);
+        return res.cookie("jwt", token, { httpOnly: true }).status(200).json("Account created successfully!", user);
     } catch (err) {
         console.log(err);
         return res.status(400).json(err.message);
@@ -50,12 +50,13 @@ const userSignin = async(req, res) => {
             existingUser.firstName,
             existingUser.lastName,
             existingUser._id, 
-            existingUser.userId, 
             existingUser.email 
         );
 
-        res.cookie("jwt", token, { httpOnly: true, maxAge: jwt_life }).status(200).json({ message: "Sign in successful", id: existingUser._id });
-
+        return res.cookie("jwt", token, { httpOnly: true, maxAge: jwt_life }).status(200).json({ 
+            message: "Sign in successful", 
+            user: existingUser 
+        });
     } catch( err ) {
         console.log(err);
        return res.status(400).json(err.message);
@@ -65,11 +66,15 @@ const userSignin = async(req, res) => {
 const userSignout = (req, res) => {
     try {
         res.cookie("jwt", "", { httpOnly: true, maxAge: 1 })
-            .status(200).json ({ Success: "You have been succesfully Logged out" });
+            .status(200).json ({ Success: "You have been successfully Logged out" });
     } catch (err) {
         console.log(err);
-       return res.status(400).json(err.message);
+        return res.status(400).json(err.message);
     }
 };
 
-module.exports = { userSignup, userSignin, userSignout };
+module.exports = { 
+    userSignup, 
+    userSignin, 
+    userSignout 
+};

@@ -16,4 +16,4 @@ const sendToMail = ( res, domain, key, messageData ) => {
       res.status(200).json(messageData)
     }
 
-  module.exports = sendToMail
+  module.exports = sendToMail;

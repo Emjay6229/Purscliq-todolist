@@ -14,7 +14,7 @@ const createTask = async(req, res) => {
     const { 
       title, 
       label, 
-      completed, 
+      // completed, 
       startDate, 
       endDate 
     } = req.body;
@@ -27,10 +27,17 @@ const createTask = async(req, res) => {
 
     if (startDate) myTask.startDate = startDate;
     if (endDate) myTask.endDate = endDate;
-    if (completed === true) myTask.completed = completed;
+    // if (completed === true) myTask.completed = completed;
+
+    if (new Date(startDate) > new Date()) {
+      myTask.status = "pending";
+    }
     
     await myTask.save();  
-    return res.status(200).json({ myTask });
+    return res.status(200).json({ 
+      message: "Task created successfully", 
+      myTask 
+    });
   } catch (err) {
     console.log(err);
     return res.status(400).json(err.message);
@@ -46,8 +53,7 @@ const getMyTasks = async(req, res) => {
       .populate("createdBy", "firstName lastName email");
 
    return res.status(200).json({
-        myTasks,
-        Task_amount: myTasks.length 
+        myTasks
       });
     } catch(err) {
       console.log(err)
@@ -81,7 +87,7 @@ const getAllTasksSentAndReceived = async(req, res) => {
 
    return res.status(200).json({ 
         myTasks,
-        Task_amount: myTasks.length 
+        TotalTask: myTasks.length 
       });
 
   } catch(err) {
@@ -102,7 +108,7 @@ const getReceivedTasks = async(req, res) => {
 
     return res.status(200).json({ 
       myTasks, 
-      Task_amount: myTotalReceivedTasks.length 
+      TotalTask: myTotalReceivedTasks.length 
     });
   } catch(err) {
     console.log(err);
@@ -122,7 +128,7 @@ const getSentTasks = async(req, res) => {
 
     return res.status(200).json({ 
       myTasks, 
-      Task_amount: sentTasks.length 
+      TotalTask: sentTasks.length 
     });
   } catch(err) {
     console.log(err);
@@ -146,15 +152,17 @@ const editTask = async(req, res) => {
 }
 
 
-const filterData = async(req, res) => {
+const filterData = async (req, res) => {
     const userPayload = checkToken(req.cookies.jwt);
 
     if(!userPayload) return res.json("cannot complete request");
 
     let { 
-      title, 
+      search,
+      title,
+      status,
       label, 
-      date,
+      date, //an oject containing start and enddate
       sortBy, 
       select, 
       limit, 
@@ -165,28 +173,44 @@ const filterData = async(req, res) => {
       createdBy: userPayload.id 
     };
 
-    if(date) filterObject.startDate = date;
-    if(title) filterObject.title = title;
-    if(label) filterObject.label = label;
-  
-    try {
-      const taskPromise = Task.find(filterObject); // returns a promise.
+    if(search) { 
+      filterObject.title = { 
+        $regex: search, 
+        $options: "i"
+      }
+    };
 
-       // sort results
+    if(title) { 
+      filterObject.title = { 
+        $regex: title, 
+        $options: "i"
+      }
+    };
+
+    if(date) filterObject.startDate = date;
+    if(status) filterObject.status = status;  
+
+    if(label) {
+      filterObject.label = { 
+        $regex: label, 
+        $options: "i"
+      };
+    };
+
+    try {
+     let taskPromise = Task.find(filterObject); // returns a promise.
+
        if(sortBy) {  
-        // remove the "," from the select query params
         sortList = sortBy.split(",").join(" ");
         taskPromise = taskPromise.sort(sortList);
       } else {
         taskPromise = taskPromise.sort('createdAt title');
-      }
+      };
 
-      // select specific atttributes to be displayed
       if(select) {
-        // remove the "," from the select query params
         selectList = select.split(",").join(" ");
         taskPromise = taskPromise.select(selectList);
-      }
+      };
   
       // set limit per page
       (limit) ? taskPromise = taskPromise.limit(parseInt(limit)) : taskPromise = taskPromise.limit(10);
@@ -197,7 +221,7 @@ const filterData = async(req, res) => {
         taskPromise = taskPromise.skip(skip);
       } else {
         taskPromise = taskPromise.skip(0);
-    } 
+    };
 
     const tasks = await taskPromise.populate("createdBy", "firstName, lastName, email");
 
