@@ -1,6 +1,8 @@
+require("dotenv").config();
 const { checkToken } = require("../middlewares/token");
 const User = require("../models/Users");
 const { createToken } = require("../middlewares/token");
+const {jwt_life} = process.env.jwt_life
 
 const getMyProfile = async (req, res) => {
     try {
