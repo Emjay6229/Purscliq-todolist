@@ -32,7 +32,10 @@ const userSignup = async ( req, res ) => {
             user.email
         );
 
-        return res.cookie("jwt", token, { httpOnly: true }).status(200).json("Account created successfully!", user);
+        return res.cookie("jwt", token, { httpOnly: true }).status(200).json({
+            message: "Account created successfully!", 
+            user 
+        });
     } catch (err) {
         console.log(err);
         return res.status(400).json(err.message);
@@ -40,7 +43,7 @@ const userSignup = async ( req, res ) => {
 };
 
 
-const userSignin = async(req, res) => {
+const userSignin = async (req, res) => {
     try {
         const { email, password } = req.body;
 
