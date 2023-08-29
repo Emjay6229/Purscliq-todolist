@@ -10,7 +10,9 @@ const userSignup = async ( req, res ) => {
         const { firstName, lastName, email, password } = req.body;
         const checkUser = await User.findOne( { email } );
 
-        if (checkUser) throw new Error("This user already exists");
+        if (checkUser) res.status(400).json( {
+            message: "This user already exists"
+        });
 
         const securePass = await bcrypt.hash(password, bcrypt.genSaltSync(10));
 
