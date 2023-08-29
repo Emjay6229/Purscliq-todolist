@@ -25,16 +25,7 @@ const userSignup = async ( req, res ) => {
 
         await user.save();
 
-        const token = createToken(
-            user.firstName,
-            user.lastName,
-            user._id,
-            user.email
-        );
-
-        return res.cookie("jwt", token, { httpOnly: true }).status(200).json({
-            message: "Account created successfully!", 
-            user });
+        return res.status(200).json({ message: "Account created successfully!" });
     } catch (err) {
         console.log(err);
         return res.status(400).json(err.message);
