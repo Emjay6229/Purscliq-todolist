@@ -32,12 +32,7 @@ const updateMyProfile = async (req, res) => {
 
     const token = createToken(updatedProfile.firstName, updatedProfile.lastName, updatedProfile._id, updatedProfile.email);
 
-    res.cookie("jwt", token, { httpOnly: true, maxAge: jwt_life }).status(200).json(
-            {
-                id: updatedProfile._id,
-                email: updatedProfile.email
-            }
-        );
+    res.cookie("jwt", token, { httpOnly: true, maxAge: jwt_life }).status(200).json({ updatedProfile });
     } catch (err) {
         console.log(err);
         return res.status(400).json(err.message);
