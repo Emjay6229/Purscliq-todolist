@@ -8,11 +8,9 @@ const { jwt_life } = process.env;
 const userSignup = async ( req, res ) => {
     try {
         const { firstName, lastName, email, password } = req.body;
-        const checkUser = await User.findOne( { email } );
+        const checkUserEmail = await User.findOne({ email }).select("email");
 
-        if (checkUser) res.status(400).json( {
-            message: "This user already exists"
-        });
+        if (checkUserEmail) throw new Error("This user already exists");
 
         const securePass = await bcrypt.hash(password, bcrypt.genSaltSync(10));
 
@@ -36,8 +34,7 @@ const userSignup = async ( req, res ) => {
 
         return res.cookie("jwt", token, { httpOnly: true }).status(200).json({
             message: "Account created successfully!", 
-            user 
-        });
+            user });
     } catch (err) {
         console.log(err);
         return res.status(400).json(err.message);
