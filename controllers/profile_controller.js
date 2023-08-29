@@ -1,4 +1,5 @@
 const { checkToken } = require("../middlewares/token");
+const User = require("../models/Users");
 
 const getMyProfile = async (req, res) => {
     try {
