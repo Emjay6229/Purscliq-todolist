@@ -1,5 +1,6 @@
 const { checkToken } = require("../middlewares/token");
 const User = require("../models/Users");
+const { createToken } = require("../middlewares/token");
 
 const getMyProfile = async (req, res) => {
     try {
@@ -59,4 +60,4 @@ module.exports = {
     getMyProfile,
     updateMyProfile,
     deleteMyProfile
-}
+};
