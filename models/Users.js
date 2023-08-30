@@ -39,7 +39,7 @@ const userSchema = Schema( {
 
 // create login method
   userSchema.statics.login = async function( email, password) {
-    const user = await this.findOne({ email }).select("-password -v");
+    const user = await this.findOne({ email });
 
     if (!user )
       throw new Error("Not Found.");
