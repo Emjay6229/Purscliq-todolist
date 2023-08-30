@@ -23,7 +23,7 @@ const userSignup = async ( req, res ) => {
         );
 
         await user.save();
-        return res.status(200).json("Account created successfully!");
+        return res.status(200).json({ message: "Account created successfully!",  user });
     } catch (err) {
         console.log(err);
         return res.status(500).json(err.message);
@@ -45,8 +45,7 @@ const userSignin = async (req, res) => {
         );
 
         return res.cookie("jwt", token, { httpOnly: true, maxAge: jwt_life }).status(200).json({ 
-            message: "Sign in successful", 
-            user
+            message: "Sign in successful"
         });
     } catch( err ) {
         console.log(err);
