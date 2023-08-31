@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const sendToMail = require("../middlewares/sendToMail");
 const domain = process.env.DOMAIN;
 const key = process.env.api_key;
+const url = process.env.url;
 
 
 exports.verifyResetEmailAndSendLink = async (req, res) => {
@@ -13,20 +14,24 @@ exports.verifyResetEmailAndSendLink = async (req, res) => {
 
 	    const verifiedUser = await User.findOne({ email });
 	    
-	    if(!verifiedUser) return res.json("User does not exist");
+	    if(!verifiedUser) 
+            return res.status(400).json("User does not exist");
 
 		const resetToken = crypto.randomBytes(32).toString("hex");
+
         verifiedUser.resetToken = resetToken;
+
         verifiedUser.resetTokenExpiration = Date.now() + 3600000; // current time in miliseconds + 1 hour in miliseconds
         
         await verifiedUser.save();
+
         const token = verifiedUser.resetToken;
            
-        const text = `<h3> Here is the link to reset your password <h3> <br>
-        <a href=http://localhost:5000/user/resetPassword/${token}>Reset Password</a>`;
+        const text = `<p>Here is the link to reset your password<p> <br>
+        <a href=${url}/reset/${token}>Reset Password</a>`;
 
         const messageData = {
-            from: 'Super Task Manager <tsm@gmail.com>',
+            from: 'Task Tracker <tsm@gmail.com>',
             to: email,
             subject: 'PASSWORD RESET LINK',
             html: text

@@ -11,11 +11,11 @@ exports.createToken = (firstName, lastName, id, email) => {
     };
 
     return jwt.sign( payLoad, secret_key, { expiresIn: jwt_life } );
-}
+};
 
 exports.checkToken = token => {
     try {
-        if(!token) throw new Error("Token not present");
+        if(!token) throw new Error("Auth token not found");
 
         const signedToken = jwt.verify(token, secret_key);
 
@@ -26,4 +26,4 @@ exports.checkToken = token => {
     } catch(e) {
         console.log(e.message);
     }
-}
+};

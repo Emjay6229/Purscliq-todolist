@@ -6,7 +6,7 @@ const {jwt_life} = process.env.jwt_life
 
 const getMyProfile = async (req, res) => {
     try {
-        const userPayload = checkToken(req.cookies.jwt);
+        const userPayload = checkToken(req.cookies.token);
 
         const myProfile = await User.findOne({ _id: userPayload.id })
             .select("firstName lastName email");
@@ -20,7 +20,7 @@ const getMyProfile = async (req, res) => {
 
 
 const updateMyProfile = async (req, res) => {
-    const userPayload = checkToken(req.cookies.jwt);
+    const userPayload = checkToken(req.cookies.token);
 
     try {
         const updatedProfile = await User.findOneAndUpdate({ _id: userPayload.id }, req.body, 
@@ -42,7 +42,7 @@ const updateMyProfile = async (req, res) => {
 
 const deleteMyProfile = async (req, res) => {
     try {
-        const userPayload = checkToken(req.cookies.jwt);
+        const userPayload = checkToken(req.cookies.token);
 
         await User.findOneAndDelete({_id: userPayload.id});
         return res.status(200).json({ Success: "Your account is deleted" });

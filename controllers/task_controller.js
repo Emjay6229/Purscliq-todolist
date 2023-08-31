@@ -7,37 +7,30 @@ const { checkToken } = require("../middlewares/token");
 const domain = process.env.domain;
 const key = process.env.api_key;
 
-
 const createTask = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.jwt);
+    const userPayload = checkToken(req.cookies.token);
+
     const { 
       title, 
       label, 
-      // completed, 
-      startDate, 
-      endDate 
+      startAt,
+      endAt
     } = req.body;
 
-    const myTask = new Task({ 
+    const task = new Task({ 
       title,
       createdBy: userPayload.id,
       label
     });
 
-    if (startDate) myTask.startDate = startDate;
-    if (endDate) myTask.endDate = endDate;
-    // if (completed === true) myTask.completed = completed;
-
-    if (new Date(startDate) > new Date()) {
-      myTask.status = "pending";
-    }
+    if(startAt) task.date = { startAt };
+    if(new Date(startAt) > new Date()) task.status = "pending";
+    if(endAt) task.date = { endAt };
+    if(new Date(endAt) <= new Date) task.status = "completed";
     
-    await myTask.save();  
-    return res.status(200).json({ 
-      message: "Task created successfully", 
-      myTask 
-    });
+    await task.save();  
+    return res.status(200).json({ message: "Task created successfully", result: task });
   } catch (err) {
     console.log(err);
     return res.status(400).json(err.message);
@@ -47,13 +40,13 @@ const createTask = async(req, res) => {
 
 const getMyTasks = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.jwt);
+    const userPayload = checkToken(req.cookies.token);
 
     const myTasks = await Task.find({ createdBy: userPayload.id })
       .populate("createdBy", "firstName lastName email");
 
    return res.status(200).json({
-        myTasks
+        result: myTasks
       });
     } catch(err) {
       console.log(err)
@@ -64,10 +57,14 @@ const getMyTasks = async(req, res) => {
 
 const getSingleTask = async(req, res) => {
   try {
-    const task = await Task.findOne({ _id: req.params.id })
-      .populate("createdBy", "firstName lastName email");
+    const userPayload = checkToken(req.cookies.token);
 
-    return res.status(200).json({ task });
+    const task = await Task.findOne({ 
+      createdBy: userPayload.id,
+      _id: req.params.id 
+    }).populate("createdBy", "firstName lastName email");
+
+    return res.status(200).json({ result: task });
   } catch (err) {
       console.log(err);
       return res.status(400).json(err.message);
@@ -77,19 +74,15 @@ const getSingleTask = async(req, res) => {
 
 const getAllTasksSentAndReceived = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.jwt);
+    const userPayload = checkToken(req.cookies.token);
 
-    const myTasks = await Task.find({ 
+    const allTasks = await Task.find({ 
       createdBy: userPayload.id,
       from: userPayload.email,
       to: userPayload.email 
     });
 
-   return res.status(200).json({ 
-        myTasks,
-        TotalTask: myTasks.length 
-      });
-
+   return res.status(200).json({ result: allTasks });
   } catch(err) {
     console.log(err)
     return res.status(400).json(err.message);
@@ -99,17 +92,14 @@ const getAllTasksSentAndReceived = async(req, res) => {
 
 const getReceivedTasks = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.jwt);
+    const userPayload = checkToken(req.cookies.token);
 
     const myTotalReceivedTasks = await Task.find({ 
       createdBy: userPayload.id, 
       to: userPayload.email 
     });
 
-    return res.status(200).json({ 
-      myTasks, 
-      TotalTask: myTotalReceivedTasks.length 
-    });
+    return res.status(200).json({ result: myTotalReceivedTasks });
   } catch(err) {
     console.log(err);
     return res.status(400).json(err.message);
@@ -119,17 +109,14 @@ const getReceivedTasks = async(req, res) => {
 
 const getSentTasks = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.jwt);
+    const userPayload = checkToken(req.cookies.token);
 
     const sentTasks = await Task.find({ 
       createdBy: userPayload.id, 
       from: userPayload.email 
     });
 
-    return res.status(200).json({ 
-      myTasks, 
-      TotalTask: sentTasks.length 
-    });
+    return res.status(200).json({ result: sentTasks });
   } catch(err) {
     console.log(err);
     return res.status(400).json(err.message);
@@ -137,32 +124,41 @@ const getSentTasks = async(req, res) => {
 };
 
 
-const editTask = async(req, res) => {
+const editTask = async (req, res) => {
   try {
-    if( req.body.completed === true ) req.body.endDate = new Date();
+    const userPayload = checkToken(req.cookies.token);
+    const task = await Task.findOneAndUpdate(
+      { 
+        createdBy: userPayload.id, 
+        _id: req.params.id 
+      }, 
+      req.body,
+      { 
+        new: true, 
+        runValidators: true 
+      }
+    );
 
-    const task = await Task.findOneAndUpdate({ _id: req.params.id }, req.body, { new: true, runValidators: true });
-
-    return res.status(200).json({ message: 'Your task has been edited', task });
-
+    return res.status(200).json({ message: 'changes saved', result: task });
   } catch(err) {
-    console.log(err)
+    console.log(err);
     return res.status(400).json(err.message);
   }
-}
+};
 
 
 const filterData = async (req, res) => {
-    const userPayload = checkToken(req.cookies.jwt);
-
-    if(!userPayload) return res.json("cannot complete request");
+    const userPayload = checkToken(req.cookies.token);
+    if(!userPayload) return res.status(500).json("cannot complete request");
 
     let { 
       search,
       title,
       status,
       label, 
-      date, //an oject containing start and enddate
+      createdAt,
+      startAt,
+      endAt,
       sortBy, 
       select, 
       limit, 
@@ -173,6 +169,7 @@ const filterData = async (req, res) => {
       createdBy: userPayload.id 
     };
 
+    // search and return task by title
     if(search) { 
       filterObject.title = { 
         $regex: search, 
@@ -180,14 +177,27 @@ const filterData = async (req, res) => {
       }
     };
 
+    // search item by date of creation
+    if(createdAt) {
+      filterObject.createdAt = createdAt
+    }
+
+    // Filter task by title
     if(title) { 
       filterObject.title = { 
         $regex: title, 
         $options: "i"
       }
     };
+    
+   if(startAt) {
+      filterObject.startAt = startAt
+    };
 
-    if(date) filterObject.startDate = date;
+    if(endAt) {
+      filterObject.endAt = endAt
+    };
+
     if(status) filterObject.status = status;  
 
     if(label) {
@@ -225,10 +235,11 @@ const filterData = async (req, res) => {
 
     const tasks = await taskPromise.populate("createdBy", "firstName, lastName, email");
 
-    return res.status(201).json({ 
-      tasks, 
-      numOfTasks: tasks.length 
-    });
+    if (tasks.length === 0) {
+      return res.status(400).json({ message: "Could not retreive any task" })
+    };
+
+    return res.status(200).json({ result: tasks });
   } catch(err) {
     console.error(err);
     return res.status(500).json(err.message);

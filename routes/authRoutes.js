@@ -1,22 +1,21 @@
 const router = require("express").Router();
-
-const { userSignup, userSignin, userSignout } = require("../controllers/auth_controller");
+const { signup, signin, signout } = require("../controllers/auth_controller");
 const { verifyResetEmailAndSendLink, updatePassword } = require("../controllers/forgot_password_controller");
 const { verifyToken } = require("../middlewares/auth");
 
 router.route("/signup")
-  .post( userSignup )
+  .post( signup );
 
 router.route("/signin")
-  .post( userSignin )
+  .post( signin );
   
-router.route("/password/reset")
-  .post( verifyResetEmailAndSendLink )
+router.route("/reset")
+  .post( verifyResetEmailAndSendLink );
 
-router.route("/password/reset/:token")
-  .patch( updatePassword )
+router.route("/reset/:token")
+  .patch( updatePassword );
 
 router.route("/signout")
-  .post( verifyToken, userSignout )
+  .post( verifyToken, signout );
 
 module.exports = router;

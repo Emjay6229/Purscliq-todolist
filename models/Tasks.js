@@ -18,7 +18,11 @@ const taskSchema = new Schema(
 
         label: String,
 
-        startDate: { type: String, default: formatDateToCustomFormat() },
+        createdAt: { type: String, default: formatDateToCustomFormat() },
+
+        startAt: { type: String, default: formatDateToCustomFormat() },
+
+        endAt: String,
 
         status: {
             type: String,
@@ -33,12 +37,8 @@ const taskSchema = new Schema(
 
         from: { type: String, ref: "Users" },
 
-        to: { type: String, ref: "Users" },
-            
-        endDate: String
-    } ,
-
-    { timestamps: true } 
+        to: { type: String, ref: "Users" }
+    }
 )
 
 module.exports = mongoose.model("Tasks", taskSchema);

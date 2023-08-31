@@ -3,13 +3,13 @@ const jwt = require("jsonwebtoken");
 const { secret_key } = process.env;
 
 const verifyToken = (req, res, next) => {
-    const token = req.cookies.jwt;
+    const token = req.cookies.token;
 
     if(!token) {
-        res.status(500).json("Authentication failed. Please sign in again");
+        res.status(500).json("Authentication failed. Please sign in");
     } else {
         jwt.verify(token, secret_key, err => { 
-            if (err) throw err.message; 
+            if(err) throw err.message; 
         })
 
         next();
