@@ -13,7 +13,7 @@ JOSHUA ONWUEMENE
 
 ## HOW TO USE (POSTMAN)
 ### Sign Up
-1. Enter the url <a href="https://task-manager-4qtw.onrender.com/user/signup/">https://task-manager-4qtw.onrender.com/auth/signup/</a> to signup.
+1. Enter the url <a href="https://task-manager-4qtw.onrender.com/auth/signup/">https://task-manager-4qtw.onrender.com/auth/signup/</a> to signup.
 2. Enter "firstName", "lastName", "email", and "password" fields.
 3. Send a POST request to the URL above.
 
