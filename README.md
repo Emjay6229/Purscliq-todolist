@@ -1,5 +1,5 @@
-# PURSCLIQ TO-DO LIST API
-A Task management API that authenticates users and allows them save, schedule and manage tasks.
+# PURSCLIQ TASK TRACKER API
+A Task Tracking system that authenticates users and allows them save, schedule and manage tasks.
 
 ## AUTHOR
 JOSHUA ONWUEMENE
@@ -13,39 +13,39 @@ JOSHUA ONWUEMENE
 
 ## HOW TO USE (POSTMAN)
 ### Sign Up
-1. Enter the url <a href="http://localhost:5000/user/signup/">http://localhost:5000/user/signup/</a> to signup.
-2. Enter "firstName", "lastName", "userId", "email", and "password" fields.
+1. Enter the url <a href="https://task-manager-4qtw.onrender.com/user/signup/">https://task-manager-4qtw.onrender.com/auth/signup/</a> to signup.
+2. Enter "firstName", "lastName", "email", and "password" fields.
 3. Send a POST request to the URL above.
 
 ### Sign In
-1. Enter the url <a href="http://localhost:5000/user/signin/">http://localhost:5000/user/signin/</a> to signin.
+1. Enter the url <a href="https://task-manager-4qtw.onrender.com/auth/signin/">https://task-manager-4qtw.onrender.com/auth/signin/</a> to signin.
 2. Enter the "email" and "password" fields.
 3. Send a POST request to the URL above.
 
 ### Sign Out
-Send a POST request to <a href="http://localhost:5000/user/signout/">http://localhost:5000/user/signout/</a> to log out.
+Send a POST request to <a href="https://task-manager-4qtw.onrender.com/auth/signout/">https://task-manager-4qtw.onrender.com/user/signout/</a> to log out.
 
 ### Reset and Update Password
-1. Send a POST request to <a href="http://localhost:5000/user/resetPassword/">http://localhost:5000/user/resetPassword/</a> receive a reset link via mail.
+1. Send a POST request to <a href="https://task-manager-4qtw.onrender.com/auth/reset">https://task-manager-4qtw.onrender.com/auth/reset/</a> receive a reset link via mail.
 2. Copy link to Postman and send a PATCH request with new password as body.
 
 ### Create, retreive, Modify and Delete tasks
-- POST <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Create task
+- POST <a href="https://task-manager-4qtw.onrender.com/api/tasks/">http://https://task-manager-4qtw.onrender.com/api/tasks/</a> : Create task
 
-- GET <a href="http://localhost:5000/user/signin/tasks/received/">http://localhost:5000/user/signin/tasks/total/</a> : Retrieve tasks created and received
-- GET <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Retrieve your tasks
-- GET <a href="http://localhost:5000/user/signin/tasks/:id">http://localhost:5000/user/signin/tasks/:id/</a> : Retrieve a specific task by id
+- GET <a href="https://task-manager-4qtw.onrender.com/api/tasks/received/">http://https://task-manager-4qtw.onrender.com/api/tasks/total/</a> : Retrieve tasks created and received
+- GET <a href="https://task-manager-4qtw.onrender.com/api/tasks/">http://https://task-manager-4qtw.onrender.com/api/tasks/</a> : Retrieve your tasks
+- GET <a href="https://task-manager-4qtw.onrender.com/api/tasks/:id">http://https://task-manager-4qtw.onrender.com/api/tasks/:id/</a> : Retrieve a specific task by id
 
-- PATCH <a href="http://localhost:5000/user/signin/tasks/:id/">http://localhost:5000/user/signin/tasks/:id</a> : Modify a task
+- PATCH <a href="https://task-manager-4qtw.onrender.com/tasks/:id/">http://https://task-manager-4qtw.onrender.com/api/tasks/:id</a> : Modify a task
 
-- DELETE <a href="http://localhost:5000/user/signin/tasks/:id/">http://localhost:5000/user/signin/tasks/:id</a> : Delete a task
-- DELETE <a href="http://localhost:5000/user/signin/tasks/">http://localhost:5000/user/signin/tasks/</a> : Delete all tasks
+- DELETE <a href="https://task-manager-4qtw.onrender.com/tasks/:id/">https://task-manager-4qtw.onrender.com/api/tasks/:id</a> : Delete a task
+- DELETE <a href="https://task-manager-4qtw.onrender.com/tasks/">https://task-manager-4qtw.onrender.com/api/tasks/</a> : Delete all tasks
 
 ### Send task to mail
-- POST <a href="http://localhost:5000/user/signin/tasks/mail">http://localhost:5000/user/signin/tasks/mail</a>
+- POST <a href="https://task-manager-4qtw.onrender.com/tasks/mail">http://https://task-manager-4qtw.onrender.com/api/tasks/mail</a>
 
 ### Export as PDF
 1. Enter "taskName" at URL below
-2. POST <a href="http://localhost:5000/user/signin/tasks/createFile">http://localhost:5000/user/signin/tasks/createFile</a>
+2. POST <a href="https://task-manager-4qtw.onrender.com/api/tasks/createFile">http://https://task-manager-4qtw.onrender.com/api/tasks/createFile</a>
 
 
