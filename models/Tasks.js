@@ -33,8 +33,6 @@ const taskSchema = new Schema(
             default: 'in progress'
         },
 
-        // completed: { type: Boolean, default: false },
-
         from: { type: String, ref: "Users" },
 
         to: { type: String, ref: "Users" }
