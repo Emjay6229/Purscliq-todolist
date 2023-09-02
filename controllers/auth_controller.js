@@ -41,7 +41,13 @@ const signin = async (req, res) => {
             user.email 
         );
 
-        return res.cookie("token", token, { httpOnly: true, maxAge: jwt_life }).status(200).json({ 
+        return res.cookie("token", token, { 
+                    httpOnly: true, 
+                    maxAge: jwt_life,
+                    secure: true, // Only send the cookie over HTTPS
+                    sameSite: 'None'
+                }
+            ).status(200).json({ 
             message: "Sign in successful", 
             user: {
                 id: user._id,
