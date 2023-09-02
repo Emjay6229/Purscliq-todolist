@@ -41,20 +41,17 @@ const signin = async (req, res) => {
             user.email 
         );
 
-        return res.cookie("token", token, { 
-                    httpOnly: true, 
-                    maxAge: jwt_life,
-                    secure: true, // Only send the cookie over HTTPS
-                    sameSite: 'None'
-                }
-            ).status(200).json({ 
+        const userData =  {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+         }
+
+        return res.status(200).json({ 
             message: "Sign in successful", 
-            user: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email
-            }
+            token,
+            user: userData
         });
     } catch(err) {
         console.log(err);
@@ -64,14 +61,12 @@ const signin = async (req, res) => {
 
 const signout = (req, res) => {
     try {
-        res.cookie("token", "", { httpOnly: true, maxAge: 1 })
-            .status(200)
-            .json("Successful");
-    } catch (err) {
-        console.log(err);
-        return res.status(500).json(err.message);
+        return req.headers.authorization = undefined;
+    } catch (error) {
+        console.error(error)
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
     }
-};
+}
 
 module.exports = { 
     signup, 

@@ -9,7 +9,8 @@ const key = process.env.api_key;
 
 const createTask = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.token);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const { 
       title, 
@@ -40,7 +41,8 @@ const createTask = async(req, res) => {
 
 const getMyTasks = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.token);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const myTasks = await Task.find({ createdBy: userPayload.id })
       .populate("createdBy", "firstName lastName email");
@@ -57,7 +59,8 @@ const getMyTasks = async(req, res) => {
 
 const getSingleTask = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.token);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const task = await Task.findOne({ 
       createdBy: userPayload.id,
@@ -74,7 +77,8 @@ const getSingleTask = async(req, res) => {
 
 const getAllTasksSentAndReceived = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.token);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const allTasks = await Task.find({ 
       createdBy: userPayload.id,
@@ -92,7 +96,8 @@ const getAllTasksSentAndReceived = async(req, res) => {
 
 const getReceivedTasks = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.token);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const myTotalReceivedTasks = await Task.find({ 
       createdBy: userPayload.id, 
@@ -109,7 +114,8 @@ const getReceivedTasks = async(req, res) => {
 
 const getSentTasks = async(req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.token);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const sentTasks = await Task.find({ 
       createdBy: userPayload.id, 
@@ -126,7 +132,8 @@ const getSentTasks = async(req, res) => {
 
 const editTask = async (req, res) => {
   try {
-    const userPayload = checkToken(req.cookies.token);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
     const task = await Task.findOneAndUpdate(
       { 
         createdBy: userPayload.id, 
@@ -148,8 +155,10 @@ const editTask = async (req, res) => {
 
 
 const filterData = async (req, res) => {
-    const userPayload = checkToken(req.cookies.token);
-    if(!userPayload) return res.status(500).json("cannot complete request");
+  const authHeader = req.headers.authorization;
+  const userPayload = checkToken(authHeader.split(" ")[1]);
+
+  if(!userPayload) return res.status(500).json("cannot complete request");
 
     let { 
       search,
@@ -262,7 +271,9 @@ const deleteOneTask =  async(req, res) => {
 
 const deleteAllTask = async(req,res) => {
   try {
-    const userPayload = checkToken(req.cookies.jwt);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
+
     await Task.deleteMany({ createdBy: userPayload.id });
     return res.status(200).json({ 
       message: "Success! all your tasks have been deleted" 
@@ -275,7 +286,9 @@ const deleteAllTask = async(req,res) => {
 
 const convertToPDF = async(req, res) => {
   const { taskName, completed, startDate, endDate } = req.body;
-  const userPayload = checkToken(req.cookies.jwt);
+
+  const authHeader = req.headers.authorization;
+  const userPayload = checkToken(authHeader.split(" ")[1]);
 
   const pdfTask = new Task({
       taskName, 
@@ -309,7 +322,8 @@ const convertToPDF = async(req, res) => {
 const sendTaskListToEmail = async (req, res) => {
   try {
     const { title, label, completed, startDate, endDate, to } = req.body;
-    const userPayload = checkToken(req.cookies.jwt);
+    const authHeader = req.headers.authorization;
+    const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const mailTask = new Task({
         title, 
