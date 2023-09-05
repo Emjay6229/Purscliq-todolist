@@ -16,13 +16,15 @@ const taskSchema = new Schema(
 
         createdBy: { type: Schema.Types.ObjectId, ref: "Users", required: true },
 
-        label: String,
+        category: String,
+
+        description: String,
 
         createdAt: { type: String, default: formatDateToCustomFormat() },
 
-        startAt: { type: String, default: formatDateToCustomFormat() },
+        startDate: { type: String, default: formatDateToCustomFormat() },
 
-        endAt: String,
+        endDate: String,
 
         status: {
             type: String,

@@ -1,18 +1,23 @@
 const router = require("express").Router();
 
 const { 
-        createTask,
-        getMyTasks, 
-        getAllTasksSentAndReceived,
-        getReceivedTasks,
-        getSingleTask, 
-        editTask,
-        deleteAllTask,  
-        deleteOneTask,
-        filterData,
-        sendTaskListToEmail,
-        convertToPDF
-    } = require("../controllers/task_controller");
+    createTask,
+    getMyTasks, 
+    getSingleTask, 
+    editTask,
+    deleteAllTask,  
+    deleteOneTask,
+    filterData,
+    convertToPDF
+} = require("../controllers/task_controller");
+
+
+const { 
+    sendTaskToEmail,
+    getAllTasksSentAndReceived,
+    getReceivedTasks,
+    getSentTasks
+} = require("../controllers/get_mailed_tasks");
 
 router.route("/")
     .post( createTask )
@@ -27,8 +32,9 @@ router.route("/:id")
     .patch( editTask )
     .delete( deleteOneTask );
 
-router.route("/all_task").get( getAllTasksSentAndReceived );
+router.route("/mail_list").get( getSentTasks );
+router.route("/mail_list").post( sendTaskToEmail );
 router.route("/total_task").get( getReceivedTasks );
-router.route("/mail_list").post( sendTaskListToEmail );
+router.route("/all_task").get( getAllTasksSentAndReceived );
 
 module.exports = router;

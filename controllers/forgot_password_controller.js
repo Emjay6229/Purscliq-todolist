@@ -1,8 +1,9 @@
 require("dotenv").config();
-const User = require("../models/Users");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+const User = require("../models/Users");
 const sendToMail = require("../middlewares/sendToMail");
+
 const domain = process.env.DOMAIN;
 const key = process.env.api_key;
 const url = process.env.url;
@@ -20,8 +21,6 @@ exports.verifyResetEmailAndSendLink = async (req, res) => {
 		const resetToken = crypto.randomBytes(32).toString("hex");
 
         verifiedUser.resetToken = resetToken;
-
-        verifiedUser.resetTokenExpiration = Date.now() + 3600000; // current time in miliseconds + 1 hour in miliseconds
         
         await verifiedUser.save();
 
@@ -38,8 +37,10 @@ exports.verifyResetEmailAndSendLink = async (req, res) => {
         };
             
         sendToMail(res, domain, key, messageData);
+
+        setTimeout(() => verifiedUser.resetToken = undefined, 3600000);
     } catch(err) {
-        console.log(err);
+        console.warn(err);
     };
 };
 

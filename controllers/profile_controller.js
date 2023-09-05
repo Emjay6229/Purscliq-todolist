@@ -2,7 +2,6 @@ require("dotenv").config();
 const { checkToken } = require("../middlewares/token");
 const User = require("../models/Users");
 const { createToken } = require("../middlewares/token");
-const {jwt_life} = process.env.jwt_life
 
 const getMyProfile = async (req, res) => {
     try {
@@ -32,9 +31,14 @@ const updateMyProfile = async (req, res) => {
             }
         ).select("firstName lastName email");
 
-    const token = createToken(updatedProfile.firstName, updatedProfile.lastName, updatedProfile._id, updatedProfile.email);
+    const token = createToken(
+            updatedProfile.firstName, 
+            updatedProfile.lastName, 
+            updatedProfile._id, 
+            updatedProfile.email
+        );
 
-    res.cookie("jwt", token, { httpOnly: true, maxAge: jwt_life }).status(200).json({ updatedProfile });
+    res.status(200).json({ message: "Success", token });
     } catch (err) {
         console.log(err);
         return res.status(400).json(err.message);

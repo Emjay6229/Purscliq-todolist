@@ -1,11 +1,10 @@
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const Task = require("../models/Tasks");
-const sendToMail = require("../middlewares/sendToMail");
 const { checkToken } = require("../middlewares/token");
 
-const domain = process.env.domain;
-const key = process.env.api_key;
+// const domain = process.env.domain;
+// const key = process.env.api_key;
 
 const createTask = async(req, res) => {
   try {
@@ -14,26 +13,28 @@ const createTask = async(req, res) => {
 
     const { 
       title, 
-      label, 
-      startAt,
-      endAt
+      category,
+      description,
+      startDate,
+      endDate
     } = req.body;
 
     const task = new Task({ 
       title,
       createdBy: userPayload.id,
-      label
+      category,
+      description
     });
 
-    if(startAt) task.date = { startAt };
-    if(new Date(startAt) > new Date()) task.status = "pending";
-    if(endAt) task.date = { endAt };
-    if(new Date(endAt) <= new Date) task.status = "completed";
+    if(startDate) task.startDate = startDate;
+    if( new Date(startDate) > new Date() ) task.status = "pending";
+    if(endDate) task.endDate = endDate;
+    if(new Date(endDate) <= new Date()) task.status = "completed";
     
     await task.save();  
     return res.status(200).json({ message: "Task created successfully", result: task });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(400).json(err.message);
   }
 };
@@ -63,70 +64,16 @@ const getSingleTask = async(req, res) => {
     const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const task = await Task.findOne({ 
-      createdBy: userPayload.id,
-      _id: req.params.id 
-    }).populate("createdBy", "firstName lastName email");
+        createdBy: userPayload.id,
+        _id: req.params.id 
+      }
+    ).populate("createdBy", "firstName lastName email");
 
     return res.status(200).json({ result: task });
   } catch (err) {
       console.log(err);
       return res.status(400).json(err.message);
     }
-};
-
-
-const getAllTasksSentAndReceived = async(req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
-    const allTasks = await Task.find({ 
-      createdBy: userPayload.id,
-      from: userPayload.email,
-      to: userPayload.email 
-    });
-
-   return res.status(200).json({ result: allTasks });
-  } catch(err) {
-    console.log(err)
-    return res.status(400).json(err.message);
-  }
-};
-
-
-const getReceivedTasks = async(req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
-    const myTotalReceivedTasks = await Task.find({ 
-      createdBy: userPayload.id, 
-      to: userPayload.email 
-    });
-
-    return res.status(200).json({ result: myTotalReceivedTasks });
-  } catch(err) {
-    console.log(err);
-    return res.status(400).json(err.message);
-  };
-};
-
-
-const getSentTasks = async(req, res) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
-    const sentTasks = await Task.find({ 
-      createdBy: userPayload.id, 
-      from: userPayload.email 
-    });
-
-    return res.status(200).json({ result: sentTasks });
-  } catch(err) {
-    console.log(err);
-    return res.status(400).json(err.message);
-  };
 };
 
 
@@ -164,10 +111,10 @@ const filterData = async (req, res) => {
       search,
       title,
       status,
-      label, 
+      category,
       createdAt,
-      startAt,
-      endAt,
+      startDate,
+      endDate,
       sortBy, 
       select, 
       limit, 
@@ -199,19 +146,19 @@ const filterData = async (req, res) => {
       }
     };
     
-   if(startAt) {
-      filterObject.startAt = startAt
+   if(startDate) {
+      filterObject.startDate = startDate
     };
 
-    if(endAt) {
-      filterObject.endAt = endAt
+    if(endDate) {
+      filterObject.endDate = endDate
     };
 
     if(status) filterObject.status = status;  
 
-    if(label) {
-      filterObject.label = { 
-        $regex: label, 
+    if(category) {
+      filterObject.category = { 
+        $regex: category, 
         $options: "i"
       };
     };
@@ -285,24 +232,26 @@ const deleteAllTask = async(req,res) => {
 };
 
 const convertToPDF = async(req, res) => {
-  const { taskName, completed, startDate, endDate } = req.body;
+  const { title, category, description, startDate, endDate } = req.body;
 
   const authHeader = req.headers.authorization;
   const userPayload = checkToken(authHeader.split(" ")[1]);
 
   const pdfTask = new Task({
-      taskName, 
-      createdBy: userPayload.id, 
-      startDate, 
-      completed,
-      endDate 
+      title, 
+      createdBy: userPayload.id,
+      label,
+      description,
+      startDate,
+      endDate
   });
 
   await pdfTask.save();
 
   const text = `Task Name: ${ pdfTask.taskName },
-  Created By: ${ userPayload.email }
-  Completed: ${ pdfTask.completed },
+  Created By: ${ userPayload.email },
+  Description: ${ pdfTask.description }
+  Status: ${ pdfTask.status },
   Start date: ${ pdfTask.startDate },
   End date: ${ pdfTask.endDate }\n\n`
 
@@ -319,59 +268,14 @@ const convertToPDF = async(req, res) => {
   }
 };
 
-const sendTaskListToEmail = async (req, res) => {
-  try {
-    const { title, label, completed, startDate, endDate, to } = req.body;
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
-    const mailTask = new Task({
-        title, 
-        createdBy: userPayload.id, 
-        label,
-        startDate, 
-        from: userPayload.email,
-        to, 
-        completed,
-        endDate 
-      });
-
-    await mailTask.save();
-
-    const text = `Task Name: ${ mailTask.title },
-    Created By: ${ userPayload.email }
-    From: ${ mailTask.from },
-    To: ${ mailTask.to },
-    Completed: ${ mailTask.completed },
-    Start date: ${ mailTask.startDate },
-    End date: ${ mailTask.endDate }\n\n`
-
-    const messageData = {
-      from: mailTask.from,
-			to: to,
-			subject: 'REQUEST FOR LIST OF TASKS',
-			text: `Here is a list of your tasks\n 
-      ${text}`
-    };
-    
-    sendToMail(res, domain, key, messageData);
-  } catch (err) {
-    console.log(err);
-    return res.status(400).json(err.message);
-  }
-};
 
 module.exports = { 
   createTask, 
   getMyTasks,
-  getAllTasksSentAndReceived,
-  getReceivedTasks,
-  getSentTasks,
   getSingleTask, 
   editTask, 
   deleteOneTask, 
   deleteAllTask,
-  sendTaskListToEmail,
   convertToPDF,
   filterData
 };

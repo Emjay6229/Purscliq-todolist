@@ -11,9 +11,9 @@ const sendToMail = ( res, domain, key, messageData ) => {
 
 	client.messages.create(domain, messageData)
       .then( res => console.log(res) )
-      .catch( err => console.error(err) )
+      .catch( err => console.error(err) );
 
-      res.status(200).json(messageData)
-    }
+      res.status(200).json(messageData);
+    };
 
   module.exports = sendToMail;

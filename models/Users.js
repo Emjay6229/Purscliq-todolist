@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const bcrypt = require("bcrypt");
-const { isEmail }= require("validator");
+const { isEmail } = require("validator");
 
 const userSchema = Schema( {
     firstName: {
@@ -33,7 +33,7 @@ const userSchema = Schema( {
     },
     
     resetToken: String,
-    resetTokenExpiration: Date,
+    // expiry: Date
   } 
 )
 

@@ -1,6 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const { secret_key, jwt_life } = process.env;
+const { secret_key } = process.env;
 
 exports.createToken = (firstName, lastName, id, email) => {
     const payLoad = {
@@ -10,7 +10,7 @@ exports.createToken = (firstName, lastName, id, email) => {
         email 
     };
 
-    return jwt.sign( payLoad, secret_key, { expiresIn: jwt_life } );
+    return jwt.sign( payLoad, secret_key, { expiresIn: "1h" } );
 };
 
 exports.checkToken = token => {

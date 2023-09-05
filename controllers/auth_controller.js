@@ -1,5 +1,4 @@
 require("dotenv").config();
-const { jwt_life } = process.env;
 const User = require("../models/Users");
 const bcrypt = require("bcrypt");
 const { createToken } = require("../middlewares/token");
