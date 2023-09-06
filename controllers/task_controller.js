@@ -35,7 +35,7 @@ const createTask = async(req, res) => {
     return res.status(200).json({ message: "Task created successfully", result: task });
   } catch (err) {
     console.error(err);
-    return res.status(400).json(err.message);
+    return res.status(500).json(err.message);
   }
 };
 
@@ -53,7 +53,7 @@ const getMyTasks = async(req, res) => {
       });
     } catch(err) {
       console.log(err)
-      return res.status(400).json(err.message);
+      return res.status(500).json(err.message);
   };
 }
 
@@ -72,21 +72,21 @@ const getSingleTask = async(req, res) => {
     return res.status(200).json({ result: task });
   } catch (err) {
       console.log(err);
-      return res.status(400).json(err.message);
+      return res.status(500).json(err.message);
     }
 };
 
 
 const editTask = async (req, res) => {
+   const authHeader = req.headers.authorization;
+   const userPayload = checkToken(authHeader.split(" ")[1]);
   try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
     const task = await Task.findOneAndUpdate(
       { 
         createdBy: userPayload.id, 
         _id: req.params.id 
       }, 
-      req.body,
+      req.body.updatedTask,
       { 
         new: true, 
         runValidators: true 
@@ -96,7 +96,7 @@ const editTask = async (req, res) => {
     return res.status(200).json({ message: 'changes saved', result: task });
   } catch(err) {
     console.log(err);
-    return res.status(400).json(err.message);
+    return res.status(500).json(err.message);
   }
 };
 
