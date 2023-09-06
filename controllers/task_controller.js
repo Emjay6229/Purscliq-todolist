@@ -78,9 +78,10 @@ const getSingleTask = async(req, res) => {
 
 
 const editTask = async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const userPayload = checkToken(authHeader.split(" ")[1]);
+
   try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
     const task = await Task.findOneAndUpdate(
       { 
         createdBy: userPayload.id, 
@@ -204,8 +205,15 @@ const filterData = async (req, res) => {
 
 
 const deleteOneTask =  async(req, res) => {
+  const authHeader = req.headers.authorization;
+  const userPayload = checkToken(authHeader.split(" ")[1]);
+
   try {
-    await Task.findOneAndDelete({ _id: req.params.id });
+    await Task.findOneAndDelete({ 
+      createdBy: userPayload.id,
+      _id: req.params.id 
+    });
+
     return res.status(200).json({ 
       message: "Success! Task has been removed" 
     });
@@ -217,10 +225,9 @@ const deleteOneTask =  async(req, res) => {
 
 
 const deleteAllTask = async(req,res) => {
+  const authHeader = req.headers.authorization;
+  const userPayload = checkToken(authHeader.split(" ")[1]);
   try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
     await Task.deleteMany({ createdBy: userPayload.id });
     return res.status(200).json({ 
       message: "Success! all your tasks have been deleted" 
