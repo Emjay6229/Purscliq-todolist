@@ -10,7 +10,7 @@ exports.createToken = (firstName, lastName, id, email) => {
         email 
     };
 
-    return jwt.sign( payLoad, secret_key, { expiresIn: "1h" } );
+    return jwt.sign( payLoad, secret_key, { expiresIn: "1d" } );
 };
 
 exports.checkToken = token => {
