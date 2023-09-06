@@ -27,7 +27,7 @@ const createTask = async(req, res) => {
     });
 
     if(startDate) task.startDate = startDate;
-    if( new Date(startDate) > new Date() ) task.status = "pending";
+    if( new Date(startDate) > new Date()) task.status = "pending";
     if(endDate) task.endDate = endDate;
     if(new Date(endDate) <= new Date()) task.status = "completed";
     
@@ -78,6 +78,9 @@ const getSingleTask = async(req, res) => {
 
 
 const editTask = async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const userPayload = checkToken(authHeader.split(" ")[1]);
+
   try {
     const task = await Task.findOneAndUpdate(
       { 
@@ -224,6 +227,7 @@ const deleteOneTask =  async(req, res) => {
 const deleteAllTask = async(req,res) => {
   const authHeader = req.headers.authorization;
   const userPayload = checkToken(authHeader.split(" ")[1]);
+
   try {
     await Task.deleteMany({ createdBy: userPayload.id });
     return res.status(200).json({ 
@@ -244,7 +248,7 @@ const convertToPDF = async(req, res) => {
   const pdfTask = new Task({
       title, 
       createdBy: userPayload.id,
-      label,
+      category,
       description,
       startDate,
       endDate
