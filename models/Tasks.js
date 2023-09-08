@@ -16,7 +16,7 @@ const taskSchema = new Schema(
 
         createdBy: { type: Schema.Types.ObjectId, ref: "Users", required: true },
 
-        category: String,
+        category: { type: String, required: true },
 
         description: String,
 

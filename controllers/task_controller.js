@@ -3,8 +3,19 @@ const fs = require("fs");
 const Task = require("../models/Tasks");
 const { checkToken } = require("../middlewares/token");
 
-// const domain = process.env.domain;
-// const key = process.env.api_key;
+function compareDateAndChangeStatus(start, current, end = null) {
+  if(( start > current && end >= start ) || (start > current && !end)) {
+    return "pending";
+  } 
+  else if((start === current && end > current ) || (start === current && !end )) {
+    return "in progress";
+  }
+  else if((start < current && end < current)) {
+      return "completed";
+    }
+
+    return;
+};
 
 const createTask = async(req, res) => {
   try {
@@ -27,10 +38,19 @@ const createTask = async(req, res) => {
     });
 
     if(startDate) task.startDate = startDate;
-    if( new Date(startDate) > new Date()) task.status = "pending";
     if(endDate) task.endDate = endDate;
-    if(new Date(endDate) <= new Date()) task.status = "completed";
-    
+
+    const currentDate = new Date();
+    const startDateString = new Date(startDate);
+    const endDateString = new Date(endDate);
+
+    const taskStatus = compareDateAndChangeStatus(startDateString, currentDate, endDateString);
+
+    if( taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed" )
+      task.status = taskStatus;
+
+    console.log(taskStatus); 
+
     await task.save();  
     return res.status(200).json({ message: "Task created successfully", result: task });
   } catch (err) {
@@ -81,20 +101,45 @@ const editTask = async (req, res) => {
   const authHeader = req.headers.authorization;
   const userPayload = checkToken(authHeader.split(" ")[1]);
 
-  try {
-    const task = await Task.findOneAndUpdate(
-      { 
-        createdBy: userPayload.id, 
-        _id: req.params.id 
-      }, 
-      req.body.updatedTask,
-      { 
-        new: true, 
-        runValidators: true 
-      }
-    );
+  console.log(req.body);
 
-    return res.status(200).json({ message: 'changes saved', result: task });
+  const filterObj =  { 
+    createdBy: userPayload.id, 
+    _id: req.params.id 
+  };
+
+  const options = { 
+    new: true, 
+    runValidators: true 
+  };
+
+  const currentDate = new Date();
+  let startDate;
+  let endDate;
+  let status;
+
+  if(req.body.startDate) {
+    startDate = new Date(req.body.startDate); 
+  };
+
+  if(req.body.endDate) {
+    endDate = new Date(req.body.endDate);
+  };
+
+  if(req.body.startDate && req.body.endDate) {
+    status = compareDateAndChangeStatus(startDate, currentDate, endDate);
+  };
+
+  if(status === "pending" || status === "in progress" || status === "completed") {
+    req.body.status = status;
+  };
+
+  try {
+      const task = await Task.findOneAndUpdate(filterObj, req.body, options);
+
+      console.log(task);
+
+      return res.status(200).redirect("/api/tasks");
   } catch(err) {
     console.log(err);
     return res.status(500).json(err.message);

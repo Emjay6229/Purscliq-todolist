@@ -48,7 +48,7 @@ exports.verifyResetEmailAndSendLink = async (req, res) => {
 exports.updatePassword = async (req, res) => {
 	const { token } = req.params;
 	const { newPassword, confirmPassword } = req.body;
-	const user = await User.findOne({ resetToken: token });
+	const user = await User.findOne({ resetToken: token }).select('resetToken');
 
 	try {
 		if (!token || token !== user.resetToken) throw new Error ("Valid reset token is needed");
