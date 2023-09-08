@@ -20,8 +20,6 @@ const taskSchema = new Schema(
 
         description: String,
 
-        createdAt: { type: String, default: formatDateToCustomFormat() },
-
         startDate: { type: String, default: formatDateToCustomFormat() },
 
         endDate: String,
@@ -37,7 +35,9 @@ const taskSchema = new Schema(
 
         from: { type: String, ref: "Users" },
 
-        to: { type: String, ref: "Users" }
+        to: { type: String, ref: "Users" },
+
+        createdAt: { type: String, default: formatDateToCustomFormat() }
     }
 )
 

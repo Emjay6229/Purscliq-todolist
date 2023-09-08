@@ -3,18 +3,28 @@ const fs = require("fs");
 const Task = require("../models/Tasks");
 const { checkToken } = require("../middlewares/token");
 
-function compareDateAndChangeStatus(start, current, end = null) {
-  if(( start > current && end >= start ) || (start > current && !end)) {
-    return "pending";
-  } 
-  else if((start === current && end > current ) || (start === current && !end )) {
-    return "in progress";
-  }
-  else if((start < current && end < current)) {
-      return "completed";
-    }
+function compareDateAndChangeStatus(start, end=undefined) {
+  const currentDate = new Date();
+  const startDate = new Date(start);
+  let endDate;
 
-    return;
+  if(end !== undefined ) {
+    endDate = new Date(end);
+  };
+ 
+  let status = "";
+
+  if( startDate > currentDate && (endDate >= startDate || !end)) {
+    status = "pending";
+  }
+  else if(startDate === currentDate && (endDate >= startDate || !end)) {
+    status = "in progress";
+  }
+  else if(endDate < currentDate) {
+    status = "completed";
+  }
+
+    return status;
 };
 
 const createTask = async(req, res) => {
@@ -22,7 +32,7 @@ const createTask = async(req, res) => {
     const authHeader = req.headers.authorization;
     const userPayload = checkToken(authHeader.split(" ")[1]);
 
-    const { 
+    let { 
       title, 
       category,
       description,
@@ -40,13 +50,11 @@ const createTask = async(req, res) => {
     if(startDate) task.startDate = startDate;
     if(endDate) task.endDate = endDate;
 
-    const currentDate = new Date();
-    const startDateString = new Date(startDate);
-    const endDateString = new Date(endDate);
+    let taskStatus;
 
-    const taskStatus = compareDateAndChangeStatus(startDateString, currentDate, endDateString);
+    if(startDate) taskStatus = compareDateAndChangeStatus(startDate, endDate);
 
-    if( taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed" )
+    if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed")
       task.status = taskStatus;
 
     console.log(taskStatus); 
@@ -66,7 +74,7 @@ const getMyTasks = async(req, res) => {
     const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const myTasks = await Task.find({ createdBy: userPayload.id })
-      .populate("createdBy", "firstName lastName email");
+      .populate("createdBy", "-_id firstName lastName");
 
    return res.status(200).json({
         result: myTasks
@@ -87,7 +95,7 @@ const getSingleTask = async(req, res) => {
         createdBy: userPayload.id,
         _id: req.params.id 
       }
-    ).populate("createdBy", "firstName lastName email");
+    ).populate("createdBy", " -_id firstName lastName");
 
     return res.status(200).json({ result: task });
   } catch (err) {
@@ -103,8 +111,6 @@ const editTask = async (req, res) => {
 
   const { updatedTask } = req.body;
 
-  console.log(updatedTask);
-
   const filterObj =  { 
     createdBy: userPayload.id, 
     _id: req.params.id 
@@ -115,33 +121,23 @@ const editTask = async (req, res) => {
     runValidators: true 
   };
 
-  const currentDate = new Date();
-  let startDate;
-  let endDate;
-  let status;
+  let start = updatedTask.startDate;
+  let end = updatedTask.endDate;
+  let taskStatus;
 
-  if(updatedTask.startDate) {
-    startDate = new Date(updatedTask.startDate); 
+  if(start) {
+    taskStatus = compareDateAndChangeStatus(start, end);
+    console.log({ taskStatus });
+    console.log({ start });
   };
 
-  if(updatedTask.endDate) {
-    endDate = new Date(updatedTask.endDate);
-  };
+  if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") updatedTask.status = taskStatus;
 
-  if(updatedTask.startDate && updatedTask.endDate) {
-    status = compareDateAndChangeStatus(startDate, currentDate, endDate);
-  };
-
-  if(status === "pending" || status === "in progress" || status === "completed") {
-    updatedTask.status = status;
-  };
+  // console.log(updatedTask);
 
   try {
-      const task = await Task.findOneAndUpdate(filterObj, updatedTask, options);
-
-      console.log(task);
-
-      return res.status(200).redirect("/api/tasks");
+    await Task.findOneAndUpdate(filterObj, updatedTask, options);
+    return res.status(200).redirect("/api/tasks");
   } catch(err) {
     console.log(err);
     return res.status(500).json(err.message);
