@@ -75,7 +75,7 @@ const getMyTasks = async(req, res) => {
       console.log(err)
       return res.status(500).json(err.message);
   };
-}
+};
 
 
 const getSingleTask = async(req, res) => {
@@ -101,7 +101,9 @@ const editTask = async (req, res) => {
   const authHeader = req.headers.authorization;
   const userPayload = checkToken(authHeader.split(" ")[1]);
 
-  console.log(req.body);
+  const { updatedTask } = req.body;
+
+  console.log(updatedTask);
 
   const filterObj =  { 
     createdBy: userPayload.id, 
@@ -118,24 +120,24 @@ const editTask = async (req, res) => {
   let endDate;
   let status;
 
-  if(req.body.startDate) {
-    startDate = new Date(req.body.startDate); 
+  if(updatedTask.startDate) {
+    startDate = new Date(updatedTask.startDate); 
   };
 
-  if(req.body.endDate) {
-    endDate = new Date(req.body.endDate);
+  if(updatedTask.endDate) {
+    endDate = new Date(updatedTask.endDate);
   };
 
-  if(req.body.startDate && req.body.endDate) {
+  if(updatedTask.startDate && updatedTask.endDate) {
     status = compareDateAndChangeStatus(startDate, currentDate, endDate);
   };
 
   if(status === "pending" || status === "in progress" || status === "completed") {
-    req.body.status = status;
+    updatedTask.status = status;
   };
 
   try {
-      const task = await Task.findOneAndUpdate(filterObj, req.body, options);
+      const task = await Task.findOneAndUpdate(filterObj, updatedTask, options);
 
       console.log(task);
 
