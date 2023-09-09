@@ -38,8 +38,6 @@ const createTask = async (req, res) => {
     if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") {
       task.status = taskStatus;
     };
-    
-    console.log({status: task.status }); 
 
     // save task to db
     await task.save();  
@@ -109,13 +107,10 @@ const editTask = async (req, res) => {
   let end = updatedTask.endDate;
   let taskStatus;
 
-  if(start) {
-    // returns empty string when date is equal to today's date at the moment indicating that the date comparison is buggy
-    taskStatus = compareDateAndChangeStatus(start, end);
-    console.log(taskStatus);
-  };
+  if(start) taskStatus = compareDateAndChangeStatus(start, end);
 
-  if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") updatedTask.status = taskStatus;
+  if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") 
+    updatedTask.status = taskStatus;
 
   try {
     await Task.findOneAndUpdate(filterObj, updatedTask, options);
@@ -125,7 +120,6 @@ const editTask = async (req, res) => {
     return res.status(500).json(err.message);
   }
 };
-
 
 const filterData = async (req, res) => {
   const authHeader = req.headers.authorization;
@@ -174,7 +168,6 @@ const filterData = async (req, res) => {
 
     // filter by start and/or end dates
    if(startDate) filterObject.startDate = startDate;
-
    if(endDate) filterObject.endDate = endDate;
 
    // filter by category and status
@@ -226,7 +219,6 @@ const filterData = async (req, res) => {
   }
 };
 
-
 const deleteOneTask =  async(req, res) => {
   const authHeader = req.headers.authorization;
   const userPayload = checkToken(authHeader.split(" ")[1]);
@@ -245,7 +237,6 @@ const deleteOneTask =  async(req, res) => {
     return res.status(400).json(err.message);
   }
 };
-
 
 const deleteAllTask = async(req,res) => {
   const authHeader = req.headers.authorization;

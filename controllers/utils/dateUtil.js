@@ -5,7 +5,7 @@ exports.formatDateToCustomFormat = () => {
   const day = date.getDate().toString().padStart(2, '0');
   
   return `${year}-${month}-${day}`;
-}
+};
 
 exports.formatStringDateToCustomFormat = (dateString) => {
   const date = new Date(dateString);
@@ -14,7 +14,7 @@ exports.formatStringDateToCustomFormat = (dateString) => {
   const day = date.getDate().toString().padStart(2, '0');
   
   return `${year}-${month}-${day}`;
-}
+};
 
 exports.compareDateAndChangeStatus = (start, end=undefined) => {
   const formattedCurrentDate = this.formatDateToCustomFormat();
