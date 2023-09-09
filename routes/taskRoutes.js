@@ -3,14 +3,13 @@ const router = require("express").Router();
 const { 
     createTask,
     getMyTasks, 
-    getSingleTask, 
+    getSpecificTask, 
     editTask,
     deleteAllTask,  
     deleteOneTask,
     filterData,
     convertToPDF
 } = require("../controllers/task_controller");
-
 
 const { 
     sendTaskToEmail,
@@ -28,10 +27,10 @@ router.route("/filter").get(filterData);
 router.route("/create_file").post( convertToPDF );
 
 router.route("/:id")
-    .get( getSingleTask )
+    .get( getSpecificTask )
     .patch( editTask )
     .delete( deleteOneTask );
-
+    
 router.route("/mail_list").get( getSentTasks );
 router.route("/mail_list").post( sendTaskToEmail );
 router.route("/total_task").get( getReceivedTasks );

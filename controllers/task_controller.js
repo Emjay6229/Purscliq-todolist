@@ -2,32 +2,9 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const Task = require("../models/Tasks");
 const { checkToken } = require("../middlewares/token");
+const { compareDateAndChangeStatus } = require("./utils/dateUtil");
 
-function compareDateAndChangeStatus(start, end=undefined) {
-  const currentDate = new Date();
-  const startDate = new Date(start);
-  let endDate;
-
-  if(end !== undefined ) {
-    endDate = new Date(end);
-  };
- 
-  let status = "";
-
-  if( startDate > currentDate && (endDate >= startDate || !end)) {
-    status = "pending";
-  }
-  else if(startDate === currentDate && (endDate >= startDate || !end)) {
-    status = "in progress";
-  }
-  else if(endDate < currentDate) {
-    status = "completed";
-  }
-
-    return status;
-};
-
-const createTask = async(req, res) => {
+const createTask = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     const userPayload = checkToken(authHeader.split(" ")[1]);
@@ -47,18 +24,24 @@ const createTask = async(req, res) => {
       description
     });
 
-    if(startDate) task.startDate = startDate;
+    // Check for dates, compare them and set task status accordingly
     if(endDate) task.endDate = endDate;
 
     let taskStatus;
 
-    if(startDate) taskStatus = compareDateAndChangeStatus(startDate, endDate);
+    if(startDate) {
+      task.startDate = startDate;
+      taskStatus = compareDateAndChangeStatus(startDate, endDate);
+      console.log({empty: taskStatus }); 
+    };
 
-    if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed")
+    if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") {
       task.status = taskStatus;
+    };
+    
+    console.log({status: task.status }); 
 
-    console.log(taskStatus); 
-
+    // save task to db
     await task.save();  
     return res.status(200).json({ message: "Task created successfully", result: task });
   } catch (err) {
@@ -74,7 +57,8 @@ const getMyTasks = async(req, res) => {
     const userPayload = checkToken(authHeader.split(" ")[1]);
 
     const myTasks = await Task.find({ createdBy: userPayload.id })
-      .populate("createdBy", "-_id firstName lastName");
+      .populate("createdBy", "-_id firstName lastName")
+      .sort("createdAt startDate title category");
 
    return res.status(200).json({
         result: myTasks
@@ -86,7 +70,7 @@ const getMyTasks = async(req, res) => {
 };
 
 
-const getSingleTask = async(req, res) => {
+const getSpecificTask = async(req, res) => {
   try {
     const authHeader = req.headers.authorization;
     const userPayload = checkToken(authHeader.split(" ")[1]);
@@ -126,14 +110,12 @@ const editTask = async (req, res) => {
   let taskStatus;
 
   if(start) {
+    // returns empty string when date is equal to today's date at the moment indicating that the date comparison is buggy
     taskStatus = compareDateAndChangeStatus(start, end);
-    console.log({ taskStatus });
-    console.log({ start });
+    console.log(taskStatus);
   };
 
   if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") updatedTask.status = taskStatus;
-
-  // console.log(updatedTask);
 
   try {
     await Task.findOneAndUpdate(filterObj, updatedTask, options);
@@ -166,7 +148,7 @@ const filterData = async (req, res) => {
     } = req.query;
 
     let filterObject = { 
-      createdBy: userPayload.id 
+      createdBy: userPayload.id
     };
 
     // search and return task by title
@@ -179,28 +161,26 @@ const filterData = async (req, res) => {
 
     // search item by date of creation
     if(createdAt) {
-      filterObject.createdAt = createdAt
+      filterObject.createdAt = createdAt;
     }
 
-    // Filter task by title
+    // filter task by title
     if(title) { 
       filterObject.title = { 
         $regex: title, 
         $options: "i"
-      }
-    };
-    
-   if(startDate) {
-      filterObject.startDate = startDate
+      };
     };
 
-    if(endDate) {
-      filterObject.endDate = endDate
-    };
+    // filter by start and/or end dates
+   if(startDate) filterObject.startDate = startDate;
 
-    if(status) filterObject.status = status;  
+   if(endDate) filterObject.endDate = endDate;
 
-    if(category) {
+   // filter by category and status
+   if(status) filterObject.status = status;
+   
+   if(category) {
       filterObject.category = { 
         $regex: category, 
         $options: "i"
@@ -323,7 +303,7 @@ const convertToPDF = async(req, res) => {
 module.exports = { 
   createTask, 
   getMyTasks,
-  getSingleTask, 
+  getSpecificTask, 
   editTask, 
   deleteOneTask, 
   deleteAllTask,

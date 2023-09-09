@@ -58,17 +58,7 @@ const signin = async (req, res) => {
     }
 };
 
-const signout = (req, res) => {
-    try {
-        return req.headers.authorization = undefined;
-    } catch (error) {
-        console.error(error)
-        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Internal server error' });
-    }
-}
-
 module.exports = { 
     signup, 
-    signin, 
-    signout 
+    signin
 };
