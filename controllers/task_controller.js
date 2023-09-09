@@ -3,6 +3,7 @@ const fs = require("fs");
 const Task = require("../models/Tasks");
 const { checkToken } = require("../middlewares/token");
 const { compareDateAndChangeStatus } = require("./utils/dateUtil");
+const { formatDateToCustomFormat } = require("./utils/dateUtil");
 
 const createTask = async (req, res) => {
   try {
@@ -32,7 +33,6 @@ const createTask = async (req, res) => {
     if(startDate) {
       task.startDate = startDate;
       taskStatus = compareDateAndChangeStatus(startDate, endDate);
-      console.log({empty: taskStatus }); 
     };
 
     if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") {
@@ -103,11 +103,14 @@ const editTask = async (req, res) => {
     runValidators: true 
   };
 
-  let start = updatedTask.startDate;
-  let end = updatedTask.endDate;
+  if(updatedTask.status && updatedTask.status === "completed")
+    updatedTask.endDate = formatDateToCustomFormat();
+
   let taskStatus;
 
-  if(start) taskStatus = compareDateAndChangeStatus(start, end);
+  // only executes if start dates and end dates are present
+  if(updatedTask.startDate)
+    taskStatus = compareDateAndChangeStatus(updatedTask.startDate, updatedTask.endDate);
 
   if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") 
     updatedTask.status = taskStatus;
