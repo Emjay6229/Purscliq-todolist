@@ -103,18 +103,23 @@ const editTask = async (req, res) => {
     runValidators: true 
   };
 
+  if (!updatedTask) {
+    return res.status(400).json("Updated task data is missing in the request body.");
+  }
+
   if(updatedTask.status && updatedTask.status === "completed")
     updatedTask.endDate = formatDateToCustomFormat();
 
   let taskStatus;
 
-  // only executes if start dates and end dates are present
+  // only executes if start dates and end dates are present 
   if(updatedTask.startDate)
     taskStatus = compareDateAndChangeStatus(updatedTask.startDate, updatedTask.endDate);
 
   if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") 
     updatedTask.status = taskStatus;
 
+  // updates data in database 
   try {
     await Task.findOneAndUpdate(filterObj, updatedTask, options);
     return res.status(200).redirect("/api/tasks");
