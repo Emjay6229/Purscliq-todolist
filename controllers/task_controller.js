@@ -91,7 +91,7 @@ const editTask = async (req, res) => {
   const authHeader = req.headers.authorization;
   const userPayload = checkToken(authHeader.split(" ")[1]);
 
-  const { updatedTask } = req.body;
+  const updatedTask = req.body;
 
   const filterObj =  { 
     createdBy: userPayload.id, 
@@ -105,7 +105,7 @@ const editTask = async (req, res) => {
 
   if (!updatedTask) {
     return res.status(400).json("Updated task data is missing in the request body.");
-  }
+  };
 
   if(updatedTask.status && updatedTask.status === "completed")
     updatedTask.endDate = formatDateToCustomFormat();
