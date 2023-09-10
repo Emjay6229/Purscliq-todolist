@@ -107,8 +107,17 @@ const editTask = async (req, res) => {
     return res.status(400).json("Updated task data is missing in the request body.");
   };
 
+  const obj = {
+    title: updatedTask.title, 
+    category: updatedTask.categorys,
+    description: updatedTask.description,
+    startDate: updatedTask.startDate,
+    endDate: updatedTask.endDate,
+    status: updatedTask.status
+  };
+
   if(updatedTask.status && updatedTask.status === "completed")
-    updatedTask.endDate = formatDateToCustomFormat();
+    obj.endDate = formatDateToCustomFormat();
 
   let taskStatus;
 
@@ -117,11 +126,11 @@ const editTask = async (req, res) => {
     taskStatus = compareDateAndChangeStatus(updatedTask.startDate, updatedTask.endDate);
 
   if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") 
-    updatedTask.status = taskStatus;
+    obj.status = taskStatus;
 
   // updates data in database 
   try {
-    await Task.findOneAndUpdate(filterObj, updatedTask, options);
+    await Task.findOneAndUpdate(filterObj, obj, options);
     return res.status(200).redirect("/api/tasks");
   } catch(err) {
     console.log(err);
