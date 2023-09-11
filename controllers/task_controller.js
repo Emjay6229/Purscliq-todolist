@@ -93,6 +93,8 @@ const editTask = async (req, res) => {
 
   const updatedTask = req.body;
 
+  console.log(updatedTask);
+
   const filterObj =  { 
     createdBy: userPayload.id, 
     _id: req.params.id 
