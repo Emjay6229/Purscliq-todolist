@@ -93,8 +93,6 @@ const editTask = async (req, res) => {
 
   const updatedTask = req.body;
 
-  console.log(updatedTask);
-
   const filterObj =  { 
     createdBy: userPayload.id, 
     _id: req.params.id 
@@ -105,34 +103,30 @@ const editTask = async (req, res) => {
     runValidators: true 
   };
 
-  if (!updatedTask) {
+  if(!updatedTask) {
     return res.status(400).json("Updated task data is missing in the request body.");
   };
 
-  const obj = {
-    title: updatedTask.title, 
-    category: updatedTask.categorys,
-    description: updatedTask.description,
-    startDate: updatedTask.startDate,
-    endDate: updatedTask.endDate,
-    status: updatedTask.status
-  };
+  if(updatedTask.status && updatedTask.status === "completed") {
+     updatedTask.endDate = formatDateToCustomFormat();
+  } else {
+      let taskStatus;
 
-  if(updatedTask.status && updatedTask.status === "completed")
-    obj.endDate = formatDateToCustomFormat();
-
-  let taskStatus;
-
-  // only executes if start dates and end dates are present 
-  if(updatedTask.startDate)
-    taskStatus = compareDateAndChangeStatus(updatedTask.startDate, updatedTask.endDate);
-
-  if(taskStatus === "pending" || taskStatus === "in progress" || taskStatus === "completed") 
-    obj.status = taskStatus;
+      if(updatedTask.startDate) {
+          taskStatus = compareDateAndChangeStatus(updatedTask.startDate, updatedTask.endDate);
+        };
+  
+      if(taskStatus === "pending" || taskStatus === "in progress") {
+        updatedTask.status = taskStatus;
+      } else if(taskStatus === "completed") {
+        updatedTask.status = taskStatus;
+        updatedTask.endDate = formatDateToCustomFormat();
+      }; 
+    };
 
   // updates data in database 
   try {
-    await Task.findOneAndUpdate(filterObj, obj, options);
+    await Task.findOneAndUpdate(filterObj, updatedTask, options);
     return res.status(200).redirect("/api/tasks");
   } catch(err) {
     console.log(err);
