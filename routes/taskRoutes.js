@@ -8,7 +8,7 @@ const {
     deleteAllTask,  
     deleteOneTask,
     filterData,
-    convertToPDF
+    // convertToPDF
 } = require("../controllers/task_controller");
 
 const { 
@@ -24,7 +24,7 @@ router.route("/")
     .delete( deleteAllTask );
 
 router.route("/filter").get(filterData);
-router.route("/create_file").post( convertToPDF );
+// router.route("/create_file").post( convertToPDF );
 
 router.route("/:id")
     .get( getSpecificTask )
