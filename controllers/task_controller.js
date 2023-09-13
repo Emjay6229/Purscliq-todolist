@@ -93,8 +93,6 @@ const editTask = async (req, res) => {
 
   const updatedTask = req.body;
 
-  console.log(updatedTask);
-
   const filterObj =  { 
     createdBy: userPayload.id, 
     _id: req.params.id 
@@ -111,7 +109,7 @@ const editTask = async (req, res) => {
 
   // Runs when user marks completed else just updates the required field
   if(updatedTask.status && updatedTask.status === "completed") {
-     updatedTask.endDate = formatDateToCustomFormat(); // works fine
+     updatedTask.endDate = formatDateToCustomFormat();
   } else {
       let taskStatus;
 
@@ -130,8 +128,7 @@ const editTask = async (req, res) => {
   // updates data in database 
   try {
     const task = await Task.findOneAndUpdate(filterObj, updatedTask, options);
-    console.log(task);
-    return res.status(200).json(task);
+    return res.status(200).json({ result: task });
   } catch(err) {
     console.log(err);
     return res.status(500).json(err.message);
