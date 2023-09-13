@@ -109,8 +109,9 @@ const editTask = async (req, res) => {
     return res.status(400).json("Updated task data is missing in the request body.");
   };
 
+  // Runs when user marks completed else just updates the required field
   if(updatedTask.status && updatedTask.status === "completed") {
-     updatedTask.endDate = formatDateToCustomFormat();
+     updatedTask.endDate = formatDateToCustomFormat(); // works fine
   } else {
       let taskStatus;
 
@@ -128,8 +129,9 @@ const editTask = async (req, res) => {
 
   // updates data in database 
   try {
-    await Task.findOneAndUpdate(filterObj, updatedTask, options);
-    return res.status(200).redirect("/api/tasks");
+    const task = await Task.findOneAndUpdate(filterObj, updatedTask, options);
+    console.log(task);
+    return res.status(200).json(task);
   } catch(err) {
     console.log(err);
     return res.status(500).json(err.message);
