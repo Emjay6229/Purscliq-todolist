@@ -1,5 +1,5 @@
-const PDFDocument = require("pdfkit");
-const fs = require("fs");
+// const PDFDocument = require("pdfkit");
+// const fs = require("fs");
 const Task = require("../models/Tasks");
 const { checkToken } = require("../middlewares/token");
 const { compareDateAndChangeStatus } = require("./utils/dateUtil");
@@ -270,42 +270,42 @@ const deleteAllTask = async(req,res) => {
   }
 };
 
-const convertToPDF = async(req, res) => {
-  const { title, category, description, startDate, endDate } = req.body;
+// const convertToPDF = async(req, res) => {
+//   const { title, category, description, startDate, endDate } = req.body;
 
-  const authHeader = req.headers.authorization;
-  const userPayload = checkToken(authHeader.split(" ")[1]);
+//   const authHeader = req.headers.authorization;
+//   const userPayload = checkToken(authHeader.split(" ")[1]);
 
-  const pdfTask = new Task({
-      title, 
-      createdBy: userPayload.id,
-      category,
-      description,
-      startDate,
-      endDate
-  });
+//   const pdfTask = new Task({
+//       title, 
+//       createdBy: userPayload.id,
+//       category,
+//       description,
+//       startDate,
+//       endDate
+//   });
 
-  await pdfTask.save();
+//   await pdfTask.save();
 
-  const text = `Task Name: ${ pdfTask.taskName },
-  Created By: ${ userPayload.email },
-  Description: ${ pdfTask.description }
-  Status: ${ pdfTask.status },
-  Start date: ${ pdfTask.startDate },
-  End date: ${ pdfTask.endDate }\n\n`
+//   const text = `Task Name: ${ pdfTask.taskName },
+//   Created By: ${ userPayload.email },
+//   Description: ${ pdfTask.description }
+//   Status: ${ pdfTask.status },
+//   Start date: ${ pdfTask.startDate },
+//   End date: ${ pdfTask.endDate }\n\n`
 
-  try {
-    const pdfDoc = new PDFDocument;
-    pdfDoc.pipe(fs.createWriteStream('Tasks.pdf'));
-    pdfDoc.text(text).toString();
-    pdfDoc.end();
+//   try {
+//     const pdfDoc = new PDFDocument;
+//     pdfDoc.pipe(fs.createWriteStream('Tasks.pdf'));
+//     pdfDoc.text(text).toString();
+//     pdfDoc.end();
 
-    return res.status(200).json({ success: "Your pdf file has been generated" });
-  } catch (err) {
-    console.log(err);
-    return res.status(401).json(err.message);
-  }
-};
+//     return res.status(200).json({ success: "Your pdf file has been generated" });
+//   } catch (err) {
+//     console.log(err);
+//     return res.status(401).json(err.message);
+//   }
+// };
 
 
 module.exports = { 
@@ -315,6 +315,6 @@ module.exports = {
   editTask, 
   deleteOneTask, 
   deleteAllTask,
-  convertToPDF,
+  // convertToPDF,
   filterData
 };
