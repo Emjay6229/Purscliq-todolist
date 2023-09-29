@@ -2,13 +2,11 @@ require("dotenv").config();
 const { checkToken } = require("../middlewares/token");
 const User = require("../models/Users");
 const { createToken } = require("../middlewares/token");
-
+const { cloudinary } = require("./utils/cloudinary");
+         
 const getMyProfile = async (req, res) => {
     try {
-        const authHeader = req.headers.authorization;
-        const userPayload = checkToken(authHeader.split(" ")[1]);
-
-        const myProfile = await User.findOne({ _id: userPayload.id })
+        const myProfile = await User.findOne({ _id: req.user.id })
             .select("firstName lastName email");
 
         return res.status(200).json( myProfile );
@@ -20,11 +18,8 @@ const getMyProfile = async (req, res) => {
 
 
 const updateMyProfile = async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
     try {
-        const updatedProfile = await User.findOneAndUpdate({ _id: userPayload.id }, req.body, 
+        const updatedProfile = await User.findOneAndUpdate({ _id: req.user.id }, req.body, 
             { 
                 new: true, 
                 runValidators: true
@@ -45,13 +40,38 @@ const updateMyProfile = async (req, res) => {
     }
 }
 
+const uploadProfilePhoto = async(req, res) => {
+    const options = { 
+        new: true, 
+        runValidators: true
+    }
+
+    try {
+        const image = req.file;
+        const uploadRes = await cloudinary.uploader.upload(image, {
+            upload_preset: "dev_preset"
+        });
+
+        console.log(uploadRes);
+
+        const userProfile = await User.findOneAndUpdate( 
+            { _id: req.user.id }, 
+            { profilePhoto: uploadRes.secure_url }, 
+            options 
+        )
+
+        await userProfile.save();
+        return res.status(201).json(uploadRes.secure_url);
+    } catch (err) {
+        console.error(err);
+        res.json(err.message)
+    }
+}
+
 
 const deleteMyProfile = async (req, res) => {
     try {
-        const authHeader = req.headers.authorization;
-        const userPayload = checkToken(authHeader.split(" ")[1]);
-
-        await User.findOneAndDelete({_id: userPayload.id});
+        await User.findOneAndDelete({_id: req.user.id});
         return res.status(200).json({ Success: "Your account is deleted" });
     } catch (err) {
         console.log(err);
@@ -59,9 +79,9 @@ const deleteMyProfile = async (req, res) => {
     }
 }
 
-
 module.exports = {
     getMyProfile,
     updateMyProfile,
-    deleteMyProfile
+    deleteMyProfile,
+    uploadProfilePhoto
 };

@@ -21,8 +21,12 @@ const userSchema = Schema( {
         required:  [true, "This field is required"],
         unique: true,
         trim: true,
-        validate: [isEmail, "invalid Email address"],
+        validate: [isEmail, "invalid email address"],
         lowerCase: true,
+    },
+
+    profilePhoto: {
+      type: String
     },
 
     password: {
@@ -32,10 +36,10 @@ const userSchema = Schema( {
         minlength: [6, "minimum password length is 6 characters"]
     },
     
-    resetToken: String,
-    // expiry: Date
+    resetToken: {
+      type: String
   } 
-)
+})
 
 // create login method
   userSchema.statics.login = async function( email, password) {

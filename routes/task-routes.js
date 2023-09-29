@@ -8,15 +8,14 @@ const {
     deleteAllTask,  
     deleteOneTask,
     filterData,
-    // convertToPDF
-} = require("../controllers/task_controller");
+} = require("../controllers/tasks");
 
 const { 
     sendTaskToEmail,
     getAllTasksSentAndReceived,
     getReceivedTasks,
     getSentTasks
-} = require("../controllers/get_mailed_tasks");
+} = require("../controllers/get-mailed-tasks");
 
 router.route("/")
     .post( createTask )
@@ -24,7 +23,6 @@ router.route("/")
     .delete( deleteAllTask );
 
 router.route("/filter").get(filterData);
-// router.route("/create_file").post( convertToPDF );
 
 router.route("/:id")
     .get( getSpecificTask )

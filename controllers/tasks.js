@@ -1,5 +1,3 @@
-// const PDFDocument = require("pdfkit");
-// const fs = require("fs");
 const Task = require("../models/Tasks");
 const { checkToken } = require("../middlewares/token");
 const { compareDateAndChangeStatus } = require("./utils/dateUtil");
@@ -7,9 +5,6 @@ const { formatDateToCustomFormat } = require("./utils/dateUtil");
 
 const createTask = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
     let { 
       title, 
       category,
@@ -20,7 +15,7 @@ const createTask = async (req, res) => {
 
     const task = new Task({ 
       title,
-      createdBy: userPayload.id,
+      createdBy: req.user.id,
       category,
       description
     });
@@ -39,7 +34,6 @@ const createTask = async (req, res) => {
       task.status = taskStatus;
     };
 
-    // save task to db
     await task.save();  
     return res.status(200).json({ message: "Task created successfully", result: task });
   } catch (err) {
@@ -51,10 +45,7 @@ const createTask = async (req, res) => {
 
 const getMyTasks = async(req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
-    const myTasks = await Task.find({ createdBy: userPayload.id })
+    const myTasks = await Task.find({ createdBy: req.user.id })
       .populate("createdBy", "-_id firstName lastName")
       .sort("createdAt startDate title category");
 
@@ -70,11 +61,8 @@ const getMyTasks = async(req, res) => {
 
 const getSpecificTask = async(req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    const userPayload = checkToken(authHeader.split(" ")[1]);
-
     const task = await Task.findOne({ 
-        createdBy: userPayload.id,
+        createdBy: req.user.id,
         _id: req.params.id 
       }
     ).populate("createdBy", " -_id firstName lastName");
@@ -88,13 +76,10 @@ const getSpecificTask = async(req, res) => {
 
 
 const editTask = async (req, res) => {
-  const authHeader = req.headers.authorization;
-  const userPayload = checkToken(authHeader.split(" ")[1]);
-
   const updatedTask = req.body;
 
   const filterObj =  { 
-    createdBy: userPayload.id, 
+    createdBy: req.user.id, 
     _id: req.params.id 
   };
 
@@ -136,10 +121,7 @@ const editTask = async (req, res) => {
 };
 
 const filterData = async (req, res) => {
-  const authHeader = req.headers.authorization;
-  const userPayload = checkToken(authHeader.split(" ")[1]);
-
-  if(!userPayload) return res.status(500).json("cannot complete request");
+  if(!req.user) return res.status(500).json("cannot complete request");
 
     let { 
       search,
@@ -156,7 +138,7 @@ const filterData = async (req, res) => {
     } = req.query;
 
     let filterObject = { 
-      createdBy: userPayload.id
+      createdBy: req.user.id
     };
 
     // search and return task by title
@@ -234,12 +216,9 @@ const filterData = async (req, res) => {
 };
 
 const deleteOneTask =  async(req, res) => {
-  const authHeader = req.headers.authorization;
-  const userPayload = checkToken(authHeader.split(" ")[1]);
-
   try {
     await Task.findOneAndDelete({ 
-      createdBy: userPayload.id,
+      createdBy: req.user.id,
       _id: req.params.id 
     });
 
@@ -253,11 +232,8 @@ const deleteOneTask =  async(req, res) => {
 };
 
 const deleteAllTask = async(req,res) => {
-  const authHeader = req.headers.authorization;
-  const userPayload = checkToken(authHeader.split(" ")[1]);
-
   try {
-    await Task.deleteMany({ createdBy: userPayload.id });
+    await Task.deleteMany({ createdBy: req.user.id});
     return res.status(200).json({ 
       message: "Success! all your tasks have been deleted" 
     });
@@ -267,44 +243,6 @@ const deleteAllTask = async(req,res) => {
   }
 };
 
-// const convertToPDF = async(req, res) => {
-//   const { title, category, description, startDate, endDate } = req.body;
-
-//   const authHeader = req.headers.authorization;
-//   const userPayload = checkToken(authHeader.split(" ")[1]);
-
-//   const pdfTask = new Task({
-//       title, 
-//       createdBy: userPayload.id,
-//       category,
-//       description,
-//       startDate,
-//       endDate
-//   });
-
-//   await pdfTask.save();
-
-//   const text = `Task Name: ${ pdfTask.taskName },
-//   Created By: ${ userPayload.email },
-//   Description: ${ pdfTask.description }
-//   Status: ${ pdfTask.status },
-//   Start date: ${ pdfTask.startDate },
-//   End date: ${ pdfTask.endDate }\n\n`
-
-//   try {
-//     const pdfDoc = new PDFDocument;
-//     pdfDoc.pipe(fs.createWriteStream('Tasks.pdf'));
-//     pdfDoc.text(text).toString();
-//     pdfDoc.end();
-
-//     return res.status(200).json({ success: "Your pdf file has been generated" });
-//   } catch (err) {
-//     console.log(err);
-//     return res.status(401).json(err.message);
-//   }
-// };
-
-
 module.exports = { 
   createTask, 
   getMyTasks,
@@ -312,6 +250,5 @@ module.exports = {
   editTask, 
   deleteOneTask, 
   deleteAllTask,
-  // convertToPDF,
   filterData
 };

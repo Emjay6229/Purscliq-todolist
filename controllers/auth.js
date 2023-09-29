@@ -7,7 +7,7 @@ const signup = async ( req, res ) => {
     try {
         const { firstName, lastName, email, password } = req.body;
         const checkUserEmail = await User.findOne({ email }).select("email");
-
+   
         if (checkUserEmail) throw new Error("This user already exists");
 
         const securePass = await bcrypt.hash(password, bcrypt.genSaltSync(10));
