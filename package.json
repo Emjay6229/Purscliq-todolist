@@ -1,11 +1,11 @@
 {
-  "name": "todo-list",
+  "name": "task-tracker",
   "version": "1.0.0",
-  "description": "Todo-list api",
+  "description": "Task-tracker helps users organise task for better productivity",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "Joshua Onwuemene",

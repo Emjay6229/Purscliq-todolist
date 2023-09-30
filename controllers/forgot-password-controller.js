@@ -2,7 +2,7 @@ require("dotenv").config();
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const User = require("../models/Users");
-const sendToMail = require("../middlewares/sendToMail");
+const sendToMail = require("./utils/sendToMail");
 
 const domain = process.env.DOMAIN;
 const key = process.env.api_key;

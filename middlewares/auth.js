@@ -3,14 +3,19 @@ const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
     const { secret_key } = process.env;
-    const token = (req.headers.authorization).split(" ")[1];
 
-    if(!token)
-        res.status(401).json("Access Denied");
+    if(!req.headers.authorization)
+        res.status(401).json("Access Denied: Authorization header required");
+
+    const [type, token] = (req.headers.authorization).split(" ");
+
+    if(!(type === 'Bearer' && token))
+        res.status(401).json("Access Denied: Bearer token required");
 
     const payload = jwt.verify(token, secret_key);
 
-    if (!payload) throw new Error("token verification error");
+    if (!payload) 
+        throw new Error("token verification error");
 
     req.user = payload;
 

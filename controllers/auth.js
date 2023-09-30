@@ -1,9 +1,9 @@
 require("dotenv").config();
 const User = require("../models/Users");
 const bcrypt = require("bcrypt");
-const { createToken } = require("../middlewares/token");
+const { createToken } = require("./utils/token");
 
-const signup = async ( req, res ) => {
+exports.signup = async ( req, res ) => {
     try {
         const { firstName, lastName, email, password } = req.body;
         const checkUserEmail = await User.findOne({ email }).select("email");
@@ -28,7 +28,7 @@ const signup = async ( req, res ) => {
 };
 
 
-const signin = async (req, res) => {
+exports.signin = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.login(email, password);
@@ -56,9 +56,4 @@ const signin = async (req, res) => {
         console.log(err);
         return res.status(500).json(err.message);
     }
-};
-
-module.exports = { 
-    signup, 
-    signin
 };

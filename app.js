@@ -1,8 +1,6 @@
-require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const connect = require("./config/mongodb");
 const { verifyToken } = require("./middlewares/auth");
 
 const authRoutes = require("./routes/auth-routes");
@@ -32,16 +30,4 @@ app.use("/api", verifyToken);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/profile", profileRoutes);
 
-const port = process.env.port || 5000;
-
-const start = async () => {
-    try {
-      await connect(process.env.MONGO_URL);
-      app.listen(port, () => console.log(`server is running on port ${port}...`))
-    } 
-    catch(err) {
-    console.log(err.message)
-  }
-}
-
-start();
+module.exports = app;

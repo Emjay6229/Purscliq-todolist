@@ -1,7 +1,6 @@
 require("dotenv").config();
-const { checkToken } = require("../middlewares/token");
 const User = require("../models/Users");
-const { createToken } = require("../middlewares/token");
+const { createToken } = require("./utils/token");
 const { cloudinary } = require("./utils/cloudinary");
          
 const getMyProfile = async (req, res) => {
@@ -46,9 +45,17 @@ const uploadProfilePhoto = async(req, res) => {
         runValidators: true
     }
 
+    const [type, ext] = req.file.mimetype.split("/");
+
+    console.log(type)
+
+    if (type !== "image") {
+        return res.status(401).json("Wrong filetype. Image files only")
+    }
+        
     try {
-        const image = req.file;
-        const uploadRes = await cloudinary.uploader.upload(image, {
+        const imagePath = req.file.path;
+        const uploadRes = await cloudinary.uploader.upload(imagePath, {
             upload_preset: "dev_preset"
         });
 

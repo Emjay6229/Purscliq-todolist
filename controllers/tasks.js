@@ -1,5 +1,4 @@
 const Task = require("../models/Tasks");
-const { checkToken } = require("../middlewares/token");
 const { compareDateAndChangeStatus } = require("./utils/dateUtil");
 const { formatDateToCustomFormat } = require("./utils/dateUtil");
 

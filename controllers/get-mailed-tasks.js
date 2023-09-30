@@ -1,43 +1,39 @@
+const Task = require("../models/Tasks");
+const sendToMail = require("./utils/sendToMail");
+
 const domain = process.env.domain;
 const key = process.env.api_key;
-const Task = require("../models/Tasks");
-const sendToMail = require("../middlewares/sendToMail");
-const { checkToken } = require("../middlewares/token");
-const Tasks = require("../models/Tasks");
 
-const sendTaskToEmail = async (req, res) => {
+exports.sendTaskToEmail = async (req, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      const userPayload = checkToken(authHeader.split(" ")[1]);
-
       if(req.body) {
         const { title, category, description, status, startDate, endAt, to } = req.body;
 
         const mailTask = new Task({
             title, 
-            createdBy: userPayload.id, 
+            createdBy: req.user.id, 
             category,
             startDate, 
             description,
-            from: userPayload.email,
+            from: req.user.email,
             to, 
             status,
-            endDate
+            endAt
           });
     
         await mailTask.save();
       } else if (req.body.title) {
             const mailTask = await Tasks.findOne({ 
-                createdBy: userPayload.id, 
+                createdBy: req.user.id, 
                 title: req.body.title 
             }); 
         } 
         else {
-            const mailTask = await Tasks.find({ createdBy: userPayload.id }); 
+            const mailTask = await Tasks.find({ createdBy: req.user.id }); 
         };
         
         const text = `Task Name: ${ mailTask.title },
-        Created By: ${ userPayload.email }
+        Created By: ${ req.user.email }
         From: ${ mailTask.from },
         To: ${ mailTask.to },
         Status: ${ mailTask.status },
@@ -61,14 +57,11 @@ const sendTaskToEmail = async (req, res) => {
 };
 
 
-const getReceivedTasks = async(req, res) => {
+exports.getReceivedTasks = async(req, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      const userPayload = checkToken(authHeader.split(" ")[1]);
-  
       const myTotalReceivedTasks = await Task.find({ 
-        createdBy: userPayload.id, 
-        to: userPayload.email 
+        createdBy: req.user.id, 
+        to: req.user.email 
       });
   
       return res.status(200).json({ result: myTotalReceivedTasks });
@@ -79,14 +72,11 @@ const getReceivedTasks = async(req, res) => {
   };
   
   
-  const getSentTasks = async(req, res) => {
+exports.getSentTasks = async(req, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      const userPayload = checkToken(authHeader.split(" ")[1]);
-  
       const sentTasks = await Task.find({ 
-        createdBy: userPayload.id, 
-        from: userPayload.email 
+        createdBy: req.user.id, 
+        from: req.user.email 
       });
   
       return res.status(200).json({ result: sentTasks });
@@ -97,15 +87,12 @@ const getReceivedTasks = async(req, res) => {
   };
 
 
-  const getAllTasksSentAndReceived = async(req, res) => {
+exports.getAllTasksSentAndReceived = async(req, res) => {
     try {
-      const authHeader = req.headers.authorization;
-      const userPayload = checkToken(authHeader.split(" ")[1]);
-  
       const allTasks = await Task.find({ 
-        createdBy: userPayload.id,
-        from: userPayload.email,
-        to: userPayload.email 
+        createdBy: req.user.id,
+        from: req.user.email,
+        to: req.user.email 
       });
   
      return res.status(200).json({ result: allTasks });
@@ -113,14 +100,4 @@ const getReceivedTasks = async(req, res) => {
       console.log(err)
       return res.status(400).json(err.message);
     }
-  };
-
-
-  module.exports = { 
-    sendTaskToEmail,
-    getAllTasksSentAndReceived,
-    getReceivedTasks,
-    getSentTasks
-  };
-  
-  
+};
