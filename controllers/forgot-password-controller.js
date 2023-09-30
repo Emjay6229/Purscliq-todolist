@@ -1,6 +1,7 @@
 require("dotenv").config();
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+
 const User = require("../models/Users");
 const sendToMail = require("./utils/sendToMail");
 
@@ -8,15 +9,13 @@ const domain = process.env.DOMAIN;
 const key = process.env.api_key;
 const url = process.env.url;
 
-
 exports.verifyResetEmailAndSendLink = async (req, res) => {
     try {
 	    const { email } = req.body;
 
 	    const verifiedUser = await User.findOne({ email });
 	    
-	    if(!verifiedUser) 
-            return res.status(400).json("User does not exist");
+	    if(!verifiedUser) return res.status(400).json("User does not exist");
 
 		const resetToken = crypto.randomBytes(32).toString("hex");
 
@@ -44,7 +43,7 @@ exports.verifyResetEmailAndSendLink = async (req, res) => {
     };
 };
 
-// Update password in the database
+
 exports.updatePassword = async (req, res) => {
 	const { token } = req.params;
 	const { newPassword, confirmPassword } = req.body;
@@ -65,7 +64,7 @@ exports.updatePassword = async (req, res) => {
             { resetToken: token }, 
             { password: securePass }, 
             { new: true, runValidators: true }
-        ).select("firstName lastName email password");
+        ).select("firstName lastName email");
 
 		console.log("Password has been successfully reset", updatedPassword);
 

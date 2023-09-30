@@ -15,11 +15,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: [
-      "https://task-management-nu-nine.vercel.app", 
-      "http://localhost:5173", 
-      "http://localhost:5174"
-    ],
+    origin: ["https://task-management-nu-nine.vercel.app", "http://localhost:5173", "http://localhost:5174"],
     methods: "GET, HEAD, PUT, POST, PATCH, DELETE",
     credentials: true
   })

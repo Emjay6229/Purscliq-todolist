@@ -47,9 +47,7 @@ const uploadProfilePhoto = async(req, res) => {
 
     const [type, ext] = req.file.mimetype.split("/");
 
-    console.log(type)
-
-    if (type !== "image") {
+    if (type !== "image" && ext !== "jpeg") {
         return res.status(401).json("Wrong filetype. Image files only")
     }
         
@@ -58,8 +56,6 @@ const uploadProfilePhoto = async(req, res) => {
         const uploadRes = await cloudinary.uploader.upload(imagePath, {
             upload_preset: "dev_preset"
         });
-
-        console.log(uploadRes);
 
         const userProfile = await User.findOneAndUpdate( 
             { _id: req.user.id }, 
