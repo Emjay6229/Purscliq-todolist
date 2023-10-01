@@ -123,24 +123,28 @@ const searchTaskByNamAndDescription = async(req, res) => {
   const { search, page, limit } = req.query;
  
   try {
-    let result = Task.find({ 
+    let searchQuery = Task.find({ 
       $text: { $search: search }
     })
 
-   limit ? result = result.limit( parseInt(limit) ) : result = result.limit(10);
+   limit ? searchQuery = searchQuery.limit( parseInt(limit) ) : searchQuery = searchQuery.limit(10);
 
    if(page) {
-    const skip = ( page - 1 ) * limit;
-    result = result.skip(skip);
+    const pageLimit = limit ? parseInt(limit) : 10;
+    const skip = ( page - 1 ) * pageLimit;
+    searchQuery = searchQuery.skip(skip);
   } else {
-    result = result.skip(10);
+    searchQuery = searchQuery.skip(0);
    }
+
+   let result = await searchQuery.exec();
 
    return res.status(200).json(result);
   } catch(err) {
     throw err;
   }
 }
+
 
 const deleteOneTask =  async(req, res) => {
   try {
