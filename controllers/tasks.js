@@ -136,7 +136,8 @@ const searchTaskByNameAndDescription = async(req, res) => {
         score: { $meta: "textScore" }, 
         metadata: 1, 
         title: 1, 
-        description: 1 
+        description: 1,
+        category: 1
       }
     )
 
