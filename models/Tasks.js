@@ -33,5 +33,5 @@ const taskSchema = new Schema(
     }
 )
 
-taskSchema.index( {title: "text", "category": "text"} )
+taskSchema.index( {title: "text", description: "text"});
 module.exports = mongoose.model("Tasks", taskSchema);

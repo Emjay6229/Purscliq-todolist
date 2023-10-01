@@ -7,6 +7,7 @@ const {
     editTask,
     deleteAllTask,  
     deleteOneTask,
+    searchTaskByNamAndDescription,
     filterData,
 } = require("../controllers/tasks");
 
@@ -33,5 +34,6 @@ router.route("/mail_list").get( getSentTasks );
 router.route("/mail_list").post( sendTaskToEmail );
 router.route("/total_task").get( getReceivedTasks );
 router.route("/all_task").get( getAllTasksSentAndReceived );
+router.route("/search").get(searchTaskByNamAndDescription);
 
 module.exports = router;

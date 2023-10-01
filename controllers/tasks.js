@@ -119,100 +119,28 @@ const editTask = async (req, res) => {
   }
 };
 
-const filterData = async (req, res) => {
-  if(!req.user) return res.status(500).json("cannot complete request");
+const searchTaskByNamAndDescription = async(req, res) => {
+  const { search, page, limit } = req.query;
+ 
+  try {
+    let result = Task.find({ 
+      $text: { $search: search }
+    })
 
-    let { 
-      search,
-      title,
-      status,
-      category,
-      createdAt,
-      startDate,
-      endDate,
-      sortBy, 
-      select, 
-      limit, 
-      page 
-    } = req.query;
+   limit ? result = result.limit( parseInt(limit) ) : result = result.limit(10);
 
-    let filterObject = { 
-      createdBy: req.user.id
-    };
+   if(page) {
+    const skip = ( page - 1 ) * limit;
+    result = result.skip(skip);
+  } else {
+    result = result.skip(10);
+   }
 
-    // search and return task by title
-    if(search) { 
-      filterObject.title = { 
-        $regex: search, 
-        $options: "i"
-      }
-    };
-
-    // search item by date of creation
-    if(createdAt) {
-      filterObject.createdAt = createdAt;
-    }
-
-    // filter task by title
-    if(title) { 
-      filterObject.title = { 
-        $regex: title, 
-        $options: "i"
-      };
-    };
-
-    // filter by start and/or end dates
-   if(startDate) filterObject.startDate = startDate;
-   if(endDate) filterObject.endDate = endDate;
-
-   // filter by category and status
-   if(status) filterObject.status = status;
-   
-   if(category) {
-      filterObject.category = { 
-        $regex: category, 
-        $options: "i"
-      };
-    };
-
-    try {
-     let taskPromise = Task.find(filterObject); // returns a promise.
-
-       if(sortBy) {  
-        sortList = sortBy.split(",").join(" ");
-        taskPromise = taskPromise.sort(sortList);
-      } else {
-        taskPromise = taskPromise.sort('createdAt title');
-      };
-
-      if(select) {
-        selectList = select.split(",").join(" ");
-        taskPromise = taskPromise.select(selectList);
-      };
-  
-      // set limit per page
-      (limit) ? taskPromise = taskPromise.limit(parseInt(limit)) : taskPromise = taskPromise.limit(10);
-
-      // paginate
-      if(page) {
-        skip = parseInt( (page - 1) * limit );
-        taskPromise = taskPromise.skip(skip);
-      } else {
-        taskPromise = taskPromise.skip(0);
-    };
-
-    const tasks = await taskPromise.populate("createdBy", "firstName, lastName, email");
-
-    if (tasks.length === 0) {
-      return res.status(400).json({ message: "Could not retreive any task" })
-    };
-
-    return res.status(200).json({ result: tasks });
+   return res.status(200).json(result);
   } catch(err) {
-    console.error(err);
-    return res.status(500).json(err.message);
+    throw err;
   }
-};
+}
 
 const deleteOneTask =  async(req, res) => {
   try {
@@ -249,5 +177,5 @@ module.exports = {
   editTask, 
   deleteOneTask, 
   deleteAllTask,
-  filterData
+  searchTaskByNamAndDescription
 };
