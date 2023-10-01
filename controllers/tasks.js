@@ -122,12 +122,25 @@ const editTask = async (req, res) => {
 const searchTaskByNameAndDescription = async(req, res) => {
   const { search, page, limit } = req.query;
 
-  console.log(search);
+  let autocompleteRegex = new RegExp(`^${search}`, 'i');
  
   try {
-    let searchQuery = Task.find({ 
-      $text: { $search: search }
-    })
+    let searchQuery = Task.find({
+        $text: { $search: search },
+        $or: [
+          { title: autocompleteRegex }, 
+          { description: autocompleteRegex }
+        ] 
+      },
+      { 
+        score: { $meta: "textScore" }, 
+        metadata: 1, 
+        title: 1, 
+        description: 1 
+      }
+    )
+
+  searchQuery = searchQuery.sort({ score: { $meta: 'textScore' } });
 
    limit ? searchQuery = searchQuery.limit( parseInt(limit) ) : searchQuery = searchQuery.limit(10);
 
