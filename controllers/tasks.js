@@ -119,8 +119,10 @@ const editTask = async (req, res) => {
   }
 };
 
-const searchTaskByNamAndDescription = async(req, res) => {
+const searchTaskByNameAndDescription = async(req, res) => {
   const { search, page, limit } = req.query;
+
+  console.log(search);
  
   try {
     let searchQuery = Task.find({ 
@@ -181,5 +183,5 @@ module.exports = {
   editTask, 
   deleteOneTask, 
   deleteAllTask,
-  searchTaskByNamAndDescription
+  searchTaskByNameAndDescription
 };
