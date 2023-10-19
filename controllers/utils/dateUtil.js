@@ -19,7 +19,6 @@ exports.formatStringDateToCustomFormat = (dateString) => {
 exports.compareDateAndChangeStatus = (start, end=undefined) => {
   const formattedCurrentDate = this.formatDateToCustomFormat();
   const startDate = this.formatStringDateToCustomFormat(start);
-
   let endDate;
   
   if(end !== undefined ) endDate = this.formatStringDateToCustomFormat(end);

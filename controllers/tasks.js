@@ -83,13 +83,12 @@ const editTask = async (req, res) => {
   };
 
   const options = { 
-    new: true, 
+    new: true,
     runValidators: true 
   };
 
-  if(!updatedTask) {
+  if(!updatedTask) 
     return res.status(400).json("Updated task data is missing in the request body.");
-  };
 
   // Runs when user marks completed else just updates the required field
   if(updatedTask.status && updatedTask.status === "completed") {
@@ -98,8 +97,8 @@ const editTask = async (req, res) => {
       let taskStatus;
 
       if(updatedTask.startDate) {
-          taskStatus = compareDateAndChangeStatus(updatedTask.startDate, updatedTask.endDate);
-        };
+        taskStatus = compareDateAndChangeStatus(updatedTask.startDate, updatedTask.endDate);
+      };
   
       if(taskStatus === "pending" || taskStatus === "in progress") {
         updatedTask.status = taskStatus;
@@ -139,9 +138,7 @@ const searchTaskByNameAndDescription = async(req, res) => {
         description: 1,
         category: 1
       }
-    )
-
-  searchQuery = searchQuery.sort({ score: { $meta: 'textScore' } });
+    ).sort({ score: { $meta: 'textScore' } });
 
    limit ? searchQuery = searchQuery.limit( parseInt(limit) ) : searchQuery = searchQuery.limit(10);
 
@@ -177,6 +174,7 @@ const deleteOneTask =  async(req, res) => {
     return res.status(400).json(err.message);
   }
 };
+
 
 const deleteAllTask = async(req,res) => {
   try {
