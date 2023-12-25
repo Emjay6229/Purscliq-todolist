@@ -8,7 +8,7 @@ try {
   const checkUserEmail = await User.findOne({ email }).select("email");
 
 	if (checkUserEmail) 
-		throw new Error("This user already exists");
+		return res.status(400).json("This user already exists");
 
     const securePass = await bcrypt.hash(password, bcrypt.genSaltSync(10));
 
