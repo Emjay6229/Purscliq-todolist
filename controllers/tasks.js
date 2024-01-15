@@ -39,8 +39,7 @@ const createTask = async (req, res) => {
     console.error(err);
     return res.status(500).json(err.message);
   }
-};
-
+}
 
 const getMyTasks = async(req, res) => {
   try {
@@ -48,15 +47,12 @@ const getMyTasks = async(req, res) => {
       .populate("createdBy", "-_id firstName lastName")
       .sort("createdAt startDate title category");
 
-   return res.status(200).json({
-        result: myTasks
-      });
-    } catch(err) {
-      console.log(err)
-      return res.status(500).json(err.message);
-  };
-};
-
+    return res.status(200).json({ result: myTasks });
+  } catch(err) {
+    console.log(err)
+    return res.status(500).json(err.message);
+  }
+}
 
 const getSpecificTask = async(req, res) => {
   try {
@@ -71,21 +67,20 @@ const getSpecificTask = async(req, res) => {
       console.log(err);
       return res.status(500).json(err.message);
     }
-};
-
+}
 
 const editTask = async (req, res) => {
   const updatedTask = req.body;
 
-  const filterObj =  { 
+  const filterObj = { 
     createdBy: req.user.id, 
     _id: req.params.id 
-  };
+  }
 
   const options = { 
     new: true,
     runValidators: true 
-  };
+  }
 
   if(!updatedTask) 
     return res.status(400).json("Updated task data is missing in the request body.");
@@ -96,17 +91,16 @@ const editTask = async (req, res) => {
   } else {
       let taskStatus;
 
-      if(updatedTask.startDate) {
+      if(updatedTask.startDate)
         taskStatus = compareDateAndChangeStatus(updatedTask.startDate, updatedTask.endDate);
-      };
   
-      if(taskStatus === "pending" || taskStatus === "in progress") {
+      if(taskStatus === "pending" || taskStatus === "in progress")
         updatedTask.status = taskStatus;
-      } else if(taskStatus === "completed") {
+      else if(taskStatus === "completed") {
         updatedTask.status = taskStatus;
         updatedTask.endDate = formatDateToCustomFormat();
-      }; 
-    };
+      }
+    }
 
   // updates data in database 
   try {
@@ -116,21 +110,18 @@ const editTask = async (req, res) => {
     console.log(err);
     return res.status(500).json(err.message);
   }
-};
+}
 
 const searchTaskByNameAndDescription = async(req, res) => {
   const { search, page, limit } = req.query;
-
   let autocompleteRegex = new RegExp(`^${search}`, 'i');
  
   try {
     let searchQuery = Task.find({
         $text: { $search: search },
-        $or: [
-          { title: autocompleteRegex }, 
-          { description: autocompleteRegex }
-        ] 
+        $or: [ { title: autocompleteRegex }, { description: autocompleteRegex }] 
       },
+
       { 
         score: { $meta: "textScore" }, 
         metadata: 1, 
@@ -140,24 +131,22 @@ const searchTaskByNameAndDescription = async(req, res) => {
       }
     ).sort({ score: { $meta: 'textScore' } });
 
-   limit ? searchQuery = searchQuery.limit( parseInt(limit) ) : searchQuery = searchQuery.limit(10);
+    limit ? searchQuery = searchQuery.limit(parseInt(limit)) : searchQuery = searchQuery.limit(10);
 
-   if(page) {
-    const pageLimit = limit ? parseInt(limit) : 10;
-    const skip = ( page - 1 ) * pageLimit;
-    searchQuery = searchQuery.skip(skip);
-  } else {
-    searchQuery = searchQuery.skip(0);
-   }
+    if(page) {
+      const pageLimit = limit ? parseInt(limit) : 10;
+      const skip = ( page - 1 ) * pageLimit;
+      searchQuery = searchQuery.skip(skip);
+    } else {
+      searchQuery = searchQuery.skip(0);
+    }
 
    let result = await searchQuery.exec();
-
    return res.status(200).json(result);
   } catch(err) {
     throw err;
   }
 }
-
 
 const deleteOneTask =  async(req, res) => {
   try {
@@ -173,8 +162,7 @@ const deleteOneTask =  async(req, res) => {
     console.log(err);
     return res.status(400).json(err.message);
   }
-};
-
+}
 
 const deleteAllTask = async(req,res) => {
   try {
@@ -186,7 +174,7 @@ const deleteAllTask = async(req,res) => {
     console.log(err);
     return res.status(400).json(err.message);
   }
-};
+}
 
 module.exports = { 
   createTask, 
@@ -196,4 +184,4 @@ module.exports = {
   deleteOneTask, 
   deleteAllTask,
   searchTaskByNameAndDescription
-};
+}
