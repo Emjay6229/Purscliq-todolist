@@ -2,24 +2,24 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
-    const { secret_key } = process.env;
+	const { SECRET_KEY } = process.env;
 
-    if(!req.headers.authorization)
-        res.status(401).json("Access Denied: Authorization header required");
+	if(!req.headers.authorization)
+		res.status(401).json("Access Denied: Authorization header required");
 
-    const [type, token] = (req.headers.authorization).split(" ");
+	const [type, token] = (req.headers.authorization).split(" ");
 
-    if(!(type === 'Bearer' && token))
-        res.status(401).json("Access Denied: Bearer token required");
+	if(!(type === 'Bearer' && token))
+		res.status(401).json("Access Denied: Bearer token required");
 
-    const payload = jwt.verify(token, secret_key);
+	const payload = jwt.verify(token, SECRET_KEY);
 
-    if (!payload) 
-        throw new Error("token verification error");
+	if (!payload) 
+		throw new Error("token verification error");
 
-    req.user = payload;
+  req.user = payload;
 
-    next();  
+  next();  
 };
 
 module.exports = { verifyToken };
