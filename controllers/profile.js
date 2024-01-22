@@ -5,10 +5,7 @@ const { cloudinary } = require("./utils/cloudinary");
          
 const getMyProfile = async (req, res) => {
     try {
-        const myProfile = await User
-					.findOne({ _id: req.user.id })
-          .select("firstName lastName email");
-
+        const myProfile = await User.findOne({ _id: req.user.id }).select("firstName lastName email");
         return res.status(200).json( myProfile );
     } catch(err) {
         console.log(err) 
@@ -19,22 +16,19 @@ const getMyProfile = async (req, res) => {
 
 const updateMyProfile = async (req, res) => {
     try {
-    	const updatedProfile = await User.findOneAndUpdate(
-				{ _id: req.user.id }, 
-				req.body, 
-        { new: true, runValidators: true }
-    	).select("firstName lastName email");
+    	const updatedProfile = await User.findOneAndUpdate({ _id: req.user.id }, req.body, { new: true, runValidators: true })
+            .select("firstName lastName email");
 
     const token = createToken(
-			updatedProfile.firstName, 
-			updatedProfile.lastName, 
-			updatedProfile._id, 
-			updatedProfile.email
-		);
+        updatedProfile.firstName, 
+        updatedProfile.lastName, 
+        updatedProfile._id, 
+        updatedProfile.email
+    );
 
     res.status(200).json({ message: "Success", token });
   } catch (err) {
-		console.log(err);
+	console.log(err);
     return res.status(400).json(err.message);
   }
 }
@@ -54,7 +48,7 @@ const uploadProfilePhoto = async(req, res) => {
             { _id: req.user.id }, 
             { profilePhoto: uploadRes.secure_url }, 
             options 
-        	);
+        );
 
         await userProfile.save();
         return res.status(201).json(uploadRes.secure_url);

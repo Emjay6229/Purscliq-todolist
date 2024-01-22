@@ -1,6 +1,4 @@
 node_modules
 .env
-pagination.js
 package-lock.json
 secureAuth.js
-pages

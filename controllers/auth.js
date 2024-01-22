@@ -6,25 +6,25 @@ exports.signup = async ( req, res ) => {
 try {
   const { firstName, lastName, email, password } = req.body;
   const checkUserEmail = await User.findOne({ email }).select("email");
+  
+  if (checkUserEmail)
+  	return res.status(400).json("This user already exists");
 
-	if (checkUserEmail) 
-		return res.status(400).json("This user already exists");
+  const securePass = await bcrypt.hash(password, bcrypt.genSaltSync(10));
 
-    const securePass = await bcrypt.hash(password, bcrypt.genSaltSync(10));
+  const user = new User({
+	firstName, 
+	lastName, 
+	email, 
+	password: securePass
+  });
 
-    const user = new User({
-			firstName, 
-			lastName, 
-			email, 
-			password: securePass
-    });
-
-	await user.save();
-	return res.status(200).json("Account created successfully!");
-} catch (err) {
-		console.log(err);
-		return res.status(500).json(err.message);
-	}
+  await user.save();
+  return res.status(200).json("Account created successfully!");
+} catch(err) {
+	console.log(err);
+	return res.status(500).json(err.message);
+  }
 };
 
 
@@ -34,10 +34,10 @@ try {
 	const user = await User.login(email, password);
 
 	const token = createToken( 
-			user.firstName,
-			user.lastName,
-			user._id, 
-			user.email 
+		user.firstName,
+		user.lastName,
+		user._id, 
+		user.email 
 	);
 
 	const userData =  {
