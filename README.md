@@ -1,4 +1,4 @@
-# PURSCLIQ TASK TRACKER API
+# TASK TRACKER API
 A Task Tracking system that authenticates users and allows them save, schedule and manage tasks.
 
 ## AUTHOR
